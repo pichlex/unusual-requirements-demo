@@ -1,4 +1,4 @@
-# 🌀 Spiral template
+# 🌀 Streamlit demo
 
 Streamlit app that analyzes hotel booking requests. 
 
