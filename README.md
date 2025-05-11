@@ -1,6 +1,6 @@
 # 🌀 Spiral template
 
-A simple Streamlit app that draws a spiral. 
+Streamlit app that analyzes hotel booking requests. 
 
 [![Open in Streamlit](https://static.streamlit.io/badges/streamlit_badge_black_white.svg)](https://basic-template.streamlit.app/)
 
