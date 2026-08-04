@@ -1,0 +1,137 @@
+<section id="components" class="section">
+  <div class="page-shell">
+    <div class="section-heading reveal" data-reveal>
+      <p class="section-kicker">02 / Component playground</p>
+      <h2 class="section-title">Beyond the slider.</h2>
+      <p class="section-description">Тот же физический приём превращён в вкладки, action button, нативный toggle и круговую control surface.</p>
+    </div>
+
+    <div class="component-grid">
+      <article class="interactive-card component-card tabs-card reveal" data-reveal>
+        <div class="component-header">
+          <div>
+            <h3 class="component-title">Haptic tabs</h3>
+            <p class="component-copy">Каждая вкладка — отдельная настоящая touch-зона поверх премиального segmented control.</p>
+          </div>
+          <span class="component-number">03</span>
+        </div>
+
+        <div class="component-stage">
+          <div id="haptic-tabs" class="haptic-tabs" role="tablist" aria-label="Демо-вкладки">
+            <span class="tabs-indicator" aria-hidden="true"></span>
+            <div class="haptic-tab is-active" role="tab" aria-selected="true" data-label="Overview">
+              <span class="haptic-tab-icon">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7" rx="2"/><rect x="14" y="3" width="7" height="7" rx="2"/><rect x="3" y="14" width="7" height="7" rx="2"/><rect x="14" y="14" width="7" height="7" rx="2"/></svg>
+                Overview
+              </span>
+              <input class="haptic-tap-input" type="checkbox" switch aria-label="Вкладка Overview">
+            </div>
+            <div class="haptic-tab" role="tab" aria-selected="false" data-label="Motion">
+              <span class="haptic-tab-icon">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 16c4-8 8 8 16-2" stroke-linecap="round"/><circle cx="5" cy="16" r="2"/><circle cx="19" cy="14" r="2"/></svg>
+                Motion
+              </span>
+              <input class="haptic-tap-input" type="checkbox" switch aria-label="Вкладка Motion">
+            </div>
+            <div class="haptic-tab" role="tab" aria-selected="false" data-label="Haptics">
+              <span class="haptic-tab-icon">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M8 5v14M12 8v8M16 3v18" stroke-linecap="round"/></svg>
+                Haptics
+              </span>
+              <input class="haptic-tap-input" type="checkbox" switch aria-label="Вкладка Haptics">
+            </div>
+          </div>
+
+          <div id="tab-panels" class="tab-panels">
+            <section class="tab-panel is-active">
+              <div><h4>One engine, many surfaces</h4><p>Range, tabs, buttons and dials share the same small set of native interaction primitives.</p></div>
+              <div class="tab-visual" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><rect x="4" y="4" width="16" height="16" rx="5"/><path d="M8 9h8M8 13h5M8 17h7" stroke-linecap="round"/></svg></div>
+            </section>
+            <section class="tab-panel">
+              <div><h4>Motion with restraint</h4><p>Spring-like transitions, light bloom and short feedback loops keep the interface fast rather than decorative.</p></div>
+              <div class="tab-visual" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M5 15c3-8 7 6 14-5" stroke-linecap="round"/><path d="m16 7 3 3-3 3" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+            </section>
+            <section class="tab-panel">
+              <div><h4>Real system feedback</h4><p>The physical tick comes from Safari’s native switch renderer while the visible component remains fully custom.</p></div>
+              <div class="tab-visual" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M8 5v14M12 8v8M16 3v18" stroke-linecap="round"/><path d="M4 10v4M20 9v6" stroke-linecap="round" opacity=".6"/></svg></div>
+            </section>
+          </div>
+
+          <div id="tabs-status" class="haptic-status" style="margin-top:14px">Tap any tab</div>
+        </div>
+      </article>
+
+      <article class="interactive-card component-card button-card reveal" data-reveal data-reveal-delay="1">
+        <div class="component-header">
+          <div>
+            <h3 class="component-title">Action button</h3>
+            <p class="component-copy">Прямой native tap, spring response, expanding ring и burst particles.</p>
+          </div>
+          <span class="component-number">04</span>
+        </div>
+
+        <div class="component-stage">
+          <div class="pulse-button-wrap">
+            <div id="pulse-button" class="pulse-button">
+              <span class="pulse-button-icon" aria-hidden="true">
+                <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.2"><path d="m13 2-9 12h7l-1 8 10-13h-7l0-7Z" stroke-linecap="round" stroke-linejoin="round"/></svg>
+              </span>
+              Launch pulse
+              <input class="haptic-tap-input" type="checkbox" switch aria-label="Запустить haptic pulse">
+            </div>
+          </div>
+
+          <div class="pulse-counter"><span>Native launches</span><strong id="pulse-count">00</strong></div>
+          <div id="button-status" class="haptic-status" style="margin-top:12px">Ready to launch</div>
+        </div>
+      </article>
+
+      <article id="toggle-card" class="interactive-card component-card toggle-card reveal" data-reveal>
+        <div class="component-header">
+          <div>
+            <h3 class="component-title">Native toggle</h3>
+            <p class="component-copy">Нативный switch остаётся видимым, а окружение реагирует на состояние как целая сцена.</p>
+          </div>
+          <span class="component-number">05</span>
+        </div>
+
+        <div class="component-stage toggle-stage">
+          <div class="toggle-hero">
+            <span class="toggle-orb" aria-hidden="true"></span>
+            <div class="toggle-copy"><b id="toggle-state">Atmosphere off</b><span>Включает более живой ambient glow по всей странице.</span></div>
+            <input id="ambient-toggle" class="native-switch" type="checkbox" switch aria-label="Переключить атмосферное освещение">
+          </div>
+          <div class="toggle-state-row"><span>System-owned haptic</span><strong id="toggle-status">Direct native switch</strong></div>
+        </div>
+      </article>
+
+      <article id="dial-card" class="interactive-card component-card dial-card reveal" data-reveal data-reveal-delay="1">
+        <div class="component-header">
+          <div>
+            <h3 class="component-title">Rotary dial</h3>
+            <p class="component-copy">Круговая визуальная крутилка с горизонтальным drag-жестом и физическими шагами по 5.</p>
+          </div>
+          <span class="component-number">06</span>
+        </div>
+
+        <div class="component-stage dial-layout">
+          <div id="dial-surface" class="dial-surface">
+            <span class="dial-shadow" aria-hidden="true"></span>
+            <div id="dial-halo" class="dial-halo" aria-hidden="true"></div>
+            <div class="dial-pointer" id="dial-pointer" aria-hidden="true"></div>
+            <div class="dial-core">
+              <div class="dial-value-wrap"><output id="dial-value" class="dial-value">64</output><span class="dial-unit">drive</span></div>
+            </div>
+            <input id="dial-driver" class="haptic-driver dial-driver" type="checkbox" switch aria-label="Круговая haptic-крутилка">
+          </div>
+
+          <div class="dial-info">
+            <div class="dial-stat"><b>Horizontal gesture</b><span>Веди пальцем слева направо прямо поверх круга.</span></div>
+            <div class="dial-stat"><b>5-point detents</b><span>Мелкие физические шаги и акцент на четвертях.</span></div>
+            <div class="dial-stat"><b id="dial-status">Drag horizontally across the dial</b><span>Live event stream</span></div>
+          </div>
+        </div>
+      </article>
+    </div>
+  </div>
+</section>
