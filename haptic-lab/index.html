@@ -5,14 +5,15 @@
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
   <meta name="theme-color" content="#050507">
   <meta name="color-scheme" content="dark">
-  <meta name="description" content="Экспериментальный набор haptic-компонентов для Safari на iPhone.">
-  <title>Haptic Lab — native feel for the web</title>
+  <meta name="description" content="Интерактивные веб-контролы с тактильной отдачей на iPhone.">
+  <title>Haptic Lab — интерфейс, который чувствуется</title>
   <link rel="stylesheet" href="./styles/base.css">
   <link rel="stylesheet" href="./styles/sliders.css">
   <link rel="stylesheet" href="./styles/components.css">
   <link rel="stylesheet" href="./styles/motion.css">
   <link rel="stylesheet" href="./styles/platform.css">
   <link rel="stylesheet" href="./styles/xy-pad.css">
+  <link rel="stylesheet" href="./styles/editorial-cleanup.css">
 </head>
 <body>
   <div id="app"></div>
@@ -31,6 +32,7 @@
       await import('./src/app.js');
       await import('./src/xy-pad-startup-fix.js');
       await import('./src/xy-pad-init.js');
+      await import('./src/editorial-cleanup.js');
     } catch (error) {
       document.documentElement.classList.remove('js');
       document.querySelectorAll('.reveal').forEach(element => {
@@ -43,7 +45,7 @@
         app.innerHTML = `
           <main style="max-width:760px;margin:120px auto;padding:24px;color:#fff;font-family:system-ui">
             <h1>Haptic Lab</h1>
-            <p>Не удалось загрузить интерактивный модуль. Обновите страницу или откройте закреплённую commit-ссылку ещё раз.</p>
+            <p>Не удалось загрузить интерактивный модуль. Обновите страницу и попробуйте ещё раз.</p>
           </main>`;
       }
     }
