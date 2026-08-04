@@ -4,7 +4,7 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
   <meta name="theme-color" content="#f5f5f7" />
-  <title>Safari Haptic Reality Check</title>
+  <title>iPhone Haptic Tap Slider</title>
   <style>
     :root {
       color-scheme: light dark;
@@ -12,138 +12,394 @@
       background: Canvas;
       color: CanvasText;
     }
+
     * { box-sizing: border-box; }
+
     body {
       margin: 0;
       min-height: 100svh;
       padding: max(24px, env(safe-area-inset-top)) 18px max(28px, env(safe-area-inset-bottom));
       background: color-mix(in srgb, Canvas 96%, CanvasText 4%);
     }
-    main { width: min(100%, 620px); margin: 0 auto; }
-    h1 { margin: 0 0 8px; font-size: clamp(28px, 8vw, 42px); line-height: 1.05; letter-spacing: -.035em; }
-    .lead { margin: 0 0 20px; opacity: .72; line-height: 1.45; }
+
+    main {
+      width: min(100%, 620px);
+      margin: 0 auto;
+    }
+
+    h1 {
+      margin: 0 0 8px;
+      font-size: clamp(29px, 8vw, 44px);
+      line-height: 1.04;
+      letter-spacing: -0.038em;
+    }
+
+    .lead {
+      margin: 0 0 20px;
+      max-width: 56ch;
+      opacity: .7;
+      line-height: 1.48;
+    }
+
     .card {
-      margin: 14px 0;
-      padding: 18px;
+      padding: 20px;
       border: 1px solid color-mix(in srgb, CanvasText 14%, transparent);
-      border-radius: 22px;
+      border-radius: 24px;
       background: Canvas;
+      box-shadow: 0 18px 50px color-mix(in srgb, CanvasText 9%, transparent);
     }
-    h2 { margin: 0 0 8px; font-size: 18px; }
-    p { line-height: 1.45; }
-    .switch-row { display: flex; align-items: center; justify-content: space-between; gap: 16px; min-height: 58px; }
-    input[type="checkbox"][switch] { transform: scale(1.2); transform-origin: right center; }
-    .value-row { display: flex; align-items: baseline; justify-content: space-between; gap: 16px; margin-bottom: 10px; }
-    output { font-size: 32px; font-weight: 750; font-variant-numeric: tabular-nums; }
-    input[type="range"] { width: 100%; height: 48px; margin: 0; }
-    .ticks { display: grid; grid-template-columns: repeat(11, 1fr); margin: -5px 9px 0; font-size: 11px; opacity: .55; }
-    .ticks span { text-align: center; }
-    .ticks span:first-child { text-align: left; }
-    .ticks span:last-child { text-align: right; }
-    button {
-      width: 100%; min-height: 46px; margin-top: 10px; padding: 10px 14px;
-      border: 1px solid color-mix(in srgb, CanvasText 15%, transparent);
-      border-radius: 13px; background: color-mix(in srgb, Canvas 92%, CanvasText 8%);
-      color: CanvasText; font: inherit; font-weight: 650;
+
+    .value-row {
+      display: flex;
+      align-items: baseline;
+      justify-content: space-between;
+      gap: 16px;
+      margin-bottom: 14px;
     }
-    .result {
-      padding: 14px 15px; border-radius: 15px;
+
+    .value-row strong { font-size: 18px; }
+
+    output {
+      min-width: 82px;
+      text-align: right;
+      font-size: 38px;
+      font-weight: 760;
+      font-variant-numeric: tabular-nums;
+      letter-spacing: -.04em;
+    }
+
+    .tap-slider {
+      --progress: 50%;
+      position: relative;
+      height: 86px;
+      margin: 0 -4px;
+      user-select: none;
+      -webkit-user-select: none;
+    }
+
+    .rail {
+      position: absolute;
+      left: 12px;
+      right: 12px;
+      top: 28px;
+      height: 8px;
+      border-radius: 999px;
+      background: color-mix(in srgb, CanvasText 16%, Canvas);
+      overflow: hidden;
+      pointer-events: none;
+    }
+
+    .rail::before {
+      content: "";
+      display: block;
+      width: var(--progress);
+      height: 100%;
+      border-radius: inherit;
+      background: #0a84ff;
+    }
+
+    .thumb {
+      position: absolute;
+      z-index: 2;
+      top: 17px;
+      left: calc(12px + (100% - 24px) * var(--value-ratio));
+      width: 30px;
+      height: 30px;
+      border-radius: 50%;
+      background: #fff;
+      box-shadow: 0 2px 9px rgb(0 0 0 / .24), 0 0 0 1px rgb(0 0 0 / .06);
+      transform: translateX(-50%);
+      pointer-events: none;
+      transition: left 120ms ease-out;
+    }
+
+    .thumb.major-hit { animation: major-pop 260ms ease-out; }
+
+    @keyframes major-pop {
+      0% { transform: translateX(-50%) scale(1); }
+      40% { transform: translateX(-50%) scale(1.22); }
+      100% { transform: translateX(-50%) scale(1); }
+    }
+
+    .zones {
+      position: absolute;
+      z-index: 4;
+      inset: 0 4px 17px;
+      display: grid;
+      grid-template-columns: repeat(21, minmax(0, 1fr));
+    }
+
+    .zone {
+      position: relative;
+      min-width: 0;
+    }
+
+    /* Project Fathom technique: the transparent native switch is the real
+       touch target. Do not add appearance:none and do not use display:none. */
+    .zone input[type="checkbox"][switch] {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      margin: 0;
+      opacity: 0;
+      cursor: pointer;
+      clip-path: inset(0);
+      -webkit-tap-highlight-color: transparent;
+      touch-action: manipulation;
+    }
+
+    .ticks {
+      position: absolute;
+      left: 12px;
+      right: 12px;
+      top: 39px;
+      display: grid;
+      grid-template-columns: repeat(21, 1fr);
+      pointer-events: none;
+    }
+
+    .tick {
+      justify-self: center;
+      width: 1px;
+      height: 7px;
+      border-radius: 1px;
+      background: color-mix(in srgb, CanvasText 28%, transparent);
+    }
+
+    .tick.major {
+      width: 2px;
+      height: 14px;
+      background: color-mix(in srgb, CanvasText 62%, transparent);
+    }
+
+    .labels {
+      position: absolute;
+      left: 8px;
+      right: 8px;
+      bottom: 0;
+      display: flex;
+      justify-content: space-between;
+      font-size: 12px;
+      font-variant-numeric: tabular-nums;
+      opacity: .58;
+      pointer-events: none;
+    }
+
+    .status {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 8px;
+      margin-top: 16px;
+    }
+
+    .status-item {
+      padding: 11px 12px;
+      border-radius: 14px;
+      background: color-mix(in srgb, CanvasText 6%, Canvas);
+    }
+
+    .status-item b,
+    .status-item span { display: block; }
+    .status-item b { font-size: 13px; }
+    .status-item span { margin-top: 3px; font-size: 12px; opacity: .64; line-height: 1.35; }
+
+    .drag-section {
+      margin-top: 18px;
+      padding-top: 17px;
+      border-top: 1px solid color-mix(in srgb, CanvasText 12%, transparent);
+    }
+
+    .drag-section label {
+      display: flex;
+      align-items: baseline;
+      justify-content: space-between;
+      gap: 12px;
+      margin-bottom: 6px;
+      font-size: 14px;
+      font-weight: 650;
+    }
+
+    .drag-section small {
+      display: block;
+      margin-bottom: 6px;
+      opacity: .6;
+      line-height: 1.4;
+    }
+
+    /* Deliberately native. Safari does not add haptic per range step. */
+    #drag-range {
+      width: 100%;
+      height: 44px;
+      margin: 0;
+    }
+
+    .note {
+      margin-top: 16px;
+      padding: 14px 15px;
+      border-radius: 15px;
       background: color-mix(in srgb, #ffcc00 15%, Canvas);
-      line-height: 1.45;
+      font-size: 14px;
+      line-height: 1.46;
     }
+
     .log {
-      min-height: 118px; padding: 13px 14px; border-radius: 15px;
+      margin-top: 14px;
+      min-height: 88px;
+      padding: 13px 14px;
+      border-radius: 15px;
       background: color-mix(in srgb, CanvasText 7%, Canvas);
       font: 12px/1.45 ui-monospace, SFMono-Regular, Menlo, monospace;
-      white-space: pre-wrap; overflow-wrap: anywhere;
+      white-space: pre-wrap;
+      overflow-wrap: anywhere;
     }
-    .muted { margin: 6px 0 0; font-size: 13px; opacity: .65; }
+
+    footer {
+      margin-top: 14px;
+      text-align: center;
+      font-size: 12px;
+      opacity: .54;
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      .thumb { transition: none; }
+      .thumb.major-hit { animation: none; }
+    }
   </style>
 </head>
 <body>
   <main>
-    <h1>Haptic Reality Check</h1>
-    <p class="lead">Проверка без хака: прямое касание нативного switch против нативного HTML-ползунка и синтетического click().</p>
+    <h1>Haptic Tap Slider</h1>
+    <p class="lead">
+      Тапни по делению: под шкалой расположены 21 настоящих прозрачных HTML-switch,
+      поэтому Safari получает физическое trusted-касание и запускает системный haptic.
+    </p>
 
-    <section class="card">
-      <div class="switch-row">
-        <div>
-          <h2>1. Прямое касание switch</h2>
-          <p class="muted">Коснись именно переключателя. Здесь ожидается системный haptic Safari.</p>
-        </div>
-        <input id="direct-switch" type="checkbox" switch aria-label="Прямой тест haptic" />
-      </div>
-      <button id="synthetic" type="button">Вызвать switch.click() программно</button>
-    </section>
-
-    <section class="card">
+    <section class="card" aria-labelledby="slider-title">
       <div class="value-row">
-        <div>
-          <h2>2. Полностью нативный range</h2>
-          <p class="muted">Без appearance:none и без кастомного thumb.</p>
+        <strong id="slider-title">Значение</strong>
+        <output id="value">50</output>
+      </div>
+
+      <div id="tap-slider" class="tap-slider" style="--progress: 50%; --value-ratio: .5">
+        <div class="rail" aria-hidden="true"></div>
+        <div id="thumb" class="thumb" aria-hidden="true"></div>
+        <div id="ticks" class="ticks" aria-hidden="true"></div>
+        <div id="zones" class="zones"></div>
+        <div class="labels" aria-hidden="true">
+          <span>0</span><span>20</span><span>40</span><span>60</span><span>80</span><span>100</span>
         </div>
-        <output id="value" for="slider">50</output>
       </div>
-      <input id="slider" type="range" min="0" max="100" step="1" value="50" list="marks" />
-      <datalist id="marks">
-        <option value="0"></option><option value="10"></option><option value="20"></option>
-        <option value="30"></option><option value="40"></option><option value="50"></option>
-        <option value="60"></option><option value="70"></option><option value="80"></option>
-        <option value="90"></option><option value="100"></option>
-      </datalist>
-      <div class="ticks" aria-hidden="true">
-        <span>0</span><span>10</span><span>20</span><span>30</span><span>40</span><span>50</span>
-        <span>60</span><span>70</span><span>80</span><span>90</span><span>100</span>
-      </div>
-    </section>
 
-    <section class="card">
-      <div class="result">
-        Если switch вибрирует, а range — нет, то веб-страница не может добавить импульсы на делениях: JavaScript-события и синтетические клики не запускают системный Taptic Engine. Разную силу на сайте Safari также задать нельзя.
+      <div class="status" aria-hidden="true">
+        <div class="status-item">
+          <b>Шаг 5</b>
+          <span>Каждая позиция — физический switch</span>
+        </div>
+        <div class="status-item">
+          <b>Крупный шаг 20</b>
+          <span>Тот же импульс, усиленная анимация</span>
+        </div>
       </div>
-    </section>
 
-    <section class="card">
-      <h2>Диагностика событий</h2>
+      <div class="drag-section">
+        <label for="drag-range">
+          <span>Обычный drag</span>
+          <span id="drag-value">50</span>
+        </label>
+        <small>Можно тянуть плавно, но Safari не даёт haptic на каждом пересечённом шаге.</small>
+        <input id="drag-range" type="range" min="0" max="100" step="1" value="50" />
+      </div>
+
+      <div class="note">
+        На iPhone сила системного импульса фиксирована. Крупные деления нельзя сделать физически сильнее без нативного приложения — здесь они отличаются только визуальной анимацией. Для гарантированного haptic нужно отпускать палец и отдельно тапать по позиции.
+      </div>
+
       <div id="log" class="log" role="status" aria-live="polite"></div>
     </section>
+
+    <footer>Safari на iPhone · техника Project Fathom · без библиотек</footer>
   </main>
 
   <script>
-    const directSwitch = document.querySelector('#direct-switch');
-    const slider = document.querySelector('#slider');
-    const value = document.querySelector('#value');
+    const tapSlider = document.querySelector('#tap-slider');
+    const zones = document.querySelector('#zones');
+    const ticks = document.querySelector('#ticks');
+    const thumb = document.querySelector('#thumb');
+    const valueOutput = document.querySelector('#value');
+    const dragRange = document.querySelector('#drag-range');
+    const dragValue = document.querySelector('#drag-value');
     const logEl = document.querySelector('#log');
+
     const lines = [];
+    let value = 50;
 
     function log(message) {
       const time = new Date().toLocaleTimeString('ru-RU', { hour12: false });
       lines.unshift(`[${time}] ${message}`);
-      logEl.textContent = lines.slice(0, 10).join('\n');
+      logEl.textContent = lines.slice(0, 7).join('\n');
     }
 
-    directSwitch.addEventListener('click', (event) => {
-      log(`switch click: isTrusted=${event.isTrusted}, checked=${directSwitch.checked}`);
+    function setValue(nextValue, source, event) {
+      value = Math.max(0, Math.min(100, Number(nextValue)));
+      const ratio = value / 100;
+
+      tapSlider.style.setProperty('--progress', `${value}%`);
+      tapSlider.style.setProperty('--value-ratio', String(ratio));
+      valueOutput.value = String(value);
+      valueOutput.textContent = String(value);
+      dragRange.value = String(value);
+      dragValue.textContent = String(value);
+
+      if (value % 20 === 0) {
+        thumb.classList.remove('major-hit');
+        void thumb.offsetWidth;
+        thumb.classList.add('major-hit');
+      }
+
+      if (source === 'tap') {
+        log(`Тап: ${value}; trusted=${event?.isTrusted ?? 'unknown'}; системный switch haptic`);
+      }
+    }
+
+    for (let stepValue = 0; stepValue <= 100; stepValue += 5) {
+      const tick = document.createElement('span');
+      tick.className = stepValue % 20 === 0 ? 'tick major' : 'tick';
+      ticks.appendChild(tick);
+
+      const zone = document.createElement('div');
+      zone.className = 'zone';
+
+      const input = document.createElement('input');
+      input.type = 'checkbox';
+      input.setAttribute('switch', '');
+      input.setAttribute('aria-label', `Установить значение ${stepValue}`);
+      input.dataset.value = String(stepValue);
+
+      input.addEventListener('change', (event) => {
+        setValue(stepValue, 'tap', event);
+
+        // Android fallback: iOS Safari ignores this API, while the direct
+        // switch touch above supplies its own native haptic on iPhone.
+        if (typeof navigator.vibrate === 'function') {
+          navigator.vibrate(stepValue % 20 === 0 ? 18 : 8);
+        }
+      });
+
+      zone.appendChild(input);
+      zones.appendChild(zone);
+    }
+
+    dragRange.addEventListener('input', (event) => {
+      setValue(event.currentTarget.value, 'drag', event);
     });
 
-    document.querySelector('#synthetic').addEventListener('click', () => {
-      directSwitch.click();
-      log('Вызван directSwitch.click(); синтетический haptic не ожидается');
+    dragRange.addEventListener('change', (event) => {
+      log(`Drag остановлен на ${event.currentTarget.value}; trusted=${event.isTrusted}; haptic шагов не ожидается`);
     });
 
-    slider.addEventListener('input', (event) => {
-      value.value = slider.value;
-      value.textContent = slider.value;
-      const n = Number(slider.value);
-      if (n % 10 === 0) log(`range input: ${n}, isTrusted=${event.isTrusted}, крупное деление`);
-    });
-
-    slider.addEventListener('change', (event) => {
-      log(`range change: ${slider.value}, isTrusted=${event.isTrusted}`);
-    });
-
-    log(`Vibration API: ${typeof navigator.vibrate === 'function' ? 'есть' : 'нет'}`);
-    log('Готово: сначала коснись switch, затем проведи нативный range.');
+    setValue(50, 'init');
+    log('Готово. Тапай по шкале, а не тяни её, чтобы получить haptic.');
   </script>
 </body>
 </html>
