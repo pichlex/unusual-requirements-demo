@@ -1,0 +1,234 @@
+/* Cross-platform interaction and polish overrides. */
+
+.desktop-pointer .haptic-driver,
+.desktop-pointer .haptic-tap-input,
+.desktop-pointer .aurora-toggle-driver {
+  -webkit-appearance: none;
+  appearance: none;
+  border: 0;
+  background: transparent;
+}
+
+.haptic-range-surface,
+.dial-surface {
+  cursor: grab;
+}
+
+.haptic-range-surface.is-dragging,
+.dial-surface.is-dragging {
+  cursor: grabbing;
+}
+
+.haptic-range-surface.is-dragging .range-thumb,
+.dial-surface.is-dragging .dial-pointer {
+  transition: none !important;
+}
+
+/* The old full-card flash looked like a render glitch on iPhone. */
+.interactive-card.is-ticking::after,
+.interactive-card.is-major-ticking::after {
+  opacity: 0 !important;
+  animation: none !important;
+}
+
+/* Keep the card surface visually stable while the transparent native renderer
+   changes its geometry for every detent. */
+.touch-capable .range-card,
+.touch-capable .dial-card {
+  transform: translateZ(0);
+  -webkit-transform: translateZ(0);
+}
+
+.touch-capable .range-card::before,
+.touch-capable .range-card::after,
+.touch-capable .dial-card::before,
+.touch-capable .dial-card::after {
+  will-change: auto;
+}
+
+/* Custom Aurora toggle ---------------------------------------------------- */
+.aurora-toggle {
+  position: relative;
+  flex: 0 0 auto;
+  width: 94px;
+  height: 54px;
+  border-radius: 999px;
+  isolation: isolate;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.aurora-toggle-track {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  border-radius: inherit;
+  background:
+    radial-gradient(circle at 24% 34%, rgba(137, 114, 255, 0.30), transparent 34%),
+    linear-gradient(135deg, rgba(255, 255, 255, 0.09), rgba(255, 255, 255, 0.025)),
+    #11111a;
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.08),
+    inset 0 -10px 24px rgba(0, 0, 0, 0.34),
+    0 16px 38px rgba(0, 0, 0, 0.28);
+  transition:
+    border-color 420ms ease,
+    background 520ms ease,
+    box-shadow 520ms ease;
+}
+
+.aurora-toggle-stars {
+  position: absolute;
+  inset: 0;
+  opacity: 0.55;
+  background-image:
+    radial-gradient(circle at 20% 28%, white 0 1px, transparent 1.5px),
+    radial-gradient(circle at 40% 68%, rgba(255, 255, 255, 0.9) 0 1px, transparent 1.5px),
+    radial-gradient(circle at 62% 24%, rgba(255, 255, 255, 0.8) 0 1px, transparent 1.5px),
+    radial-gradient(circle at 76% 70%, rgba(255, 255, 255, 0.7) 0 1px, transparent 1.5px);
+  transition: opacity 420ms ease, transform 720ms var(--ease-out);
+}
+
+.aurora-toggle-thumb {
+  position: absolute;
+  top: 5px;
+  left: 5px;
+  width: 44px;
+  height: 44px;
+  display: grid;
+  place-items: center;
+  border-radius: 50%;
+  background:
+    radial-gradient(circle at 35% 25%, #fff, #e9e5ff 52%, #bdb4ff 100%);
+  box-shadow:
+    0 8px 18px rgba(0, 0, 0, 0.36),
+    0 0 0 5px rgba(130, 105, 255, 0.07),
+    inset 0 -4px 9px rgba(82, 60, 170, 0.18);
+  transform: translateX(0) rotate(-8deg);
+  transition:
+    transform 620ms var(--ease-out),
+    background 420ms ease,
+    box-shadow 420ms ease;
+}
+
+.aurora-toggle-core {
+  width: 21px;
+  height: 21px;
+  border-radius: 50%;
+  background: linear-gradient(145deg, #7c62ff, #4f8cff 62%, #54dde3);
+  box-shadow:
+    inset 0 1px 1px rgba(255, 255, 255, 0.55),
+    0 0 14px rgba(111, 102, 255, 0.55);
+  transition: background 420ms ease, box-shadow 420ms ease;
+}
+
+.aurora-toggle.is-on .aurora-toggle-track {
+  border-color: rgba(109, 244, 180, 0.42);
+  background:
+    radial-gradient(circle at 72% 32%, rgba(94, 231, 162, 0.38), transparent 38%),
+    radial-gradient(circle at 34% 78%, rgba(67, 136, 255, 0.26), transparent 40%),
+    linear-gradient(135deg, rgba(255, 255, 255, 0.11), rgba(255, 255, 255, 0.035)),
+    #0d1715;
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.10),
+    inset 0 -10px 24px rgba(0, 0, 0, 0.25),
+    0 16px 42px rgba(35, 164, 107, 0.22),
+    0 0 34px rgba(94, 231, 162, 0.12);
+}
+
+.aurora-toggle.is-on .aurora-toggle-stars {
+  opacity: 0.9;
+  transform: translateX(-7px) rotate(8deg) scale(1.08);
+}
+
+.aurora-toggle.is-on .aurora-toggle-thumb {
+  transform: translateX(40px) rotate(10deg);
+  background:
+    radial-gradient(circle at 35% 25%, #effff7, #c7ffe1 54%, #72e8ab 100%);
+  box-shadow:
+    0 8px 20px rgba(0, 0, 0, 0.34),
+    0 0 0 5px rgba(94, 231, 162, 0.09),
+    0 0 24px rgba(94, 231, 162, 0.30),
+    inset 0 -4px 9px rgba(36, 132, 88, 0.16);
+}
+
+.aurora-toggle.is-on .aurora-toggle-core {
+  background: linear-gradient(145deg, #c8ffe1, #5ee7a2 48%, #3b9cff);
+  box-shadow:
+    inset 0 1px 1px rgba(255, 255, 255, 0.72),
+    0 0 16px rgba(94, 231, 162, 0.72);
+}
+
+.aurora-toggle-driver {
+  position: absolute;
+  inset: 0;
+  z-index: 5;
+  width: 100%;
+  height: 100%;
+  margin: 0;
+  opacity: 0;
+  cursor: pointer;
+  clip-path: inset(0 round 999px);
+  -webkit-tap-highlight-color: transparent;
+  touch-action: manipulation;
+}
+
+.aurora-toggle:has(.aurora-toggle-driver:focus-visible) {
+  outline: 3px solid rgba(135, 112, 255, 0.72);
+  outline-offset: 4px;
+}
+
+/* Dial -------------------------------------------------------------------- */
+.dial-surface {
+  cursor: grab;
+}
+
+.dial-surface.is-dragging {
+  cursor: grabbing;
+}
+
+.dial-pointer {
+  transition: transform 72ms linear;
+  will-change: transform;
+}
+
+.dial-surface.is-dragging .dial-pointer {
+  transition: none;
+}
+
+.dial-driver {
+  top: 0;
+  width: 100%;
+  height: 100%;
+  clip-path: circle(50% at 50% 50%);
+}
+
+.desktop-pointer .dial-surface:hover .dial-core {
+  border-color: rgba(255, 255, 255, 0.15);
+  box-shadow:
+    0 18px 48px rgba(0, 0, 0, 0.54),
+    0 0 32px rgba(97, 105, 255, 0.10),
+    inset 0 1px 0 rgba(255, 255, 255, 0.10),
+    inset 0 -14px 30px rgba(0, 0, 0, 0.32);
+}
+
+@media (max-width: 560px) {
+  .toggle-hero {
+    align-items: flex-start;
+  }
+
+  .aurora-toggle {
+    width: 86px;
+    height: 50px;
+  }
+
+  .aurora-toggle-thumb {
+    width: 40px;
+    height: 40px;
+  }
+
+  .aurora-toggle.is-on .aurora-toggle-thumb {
+    transform: translateX(36px) rotate(10deg);
+  }
+}
