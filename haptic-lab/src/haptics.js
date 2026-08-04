@@ -80,7 +80,6 @@ export class HapticRange {
 
     this.parkingApplied = false;
     this.storedStartLocal = null;
-    this.capturedStartLocal = null;
 
     this.firstArmed = false;
     this.hasTicked = false;
@@ -218,13 +217,13 @@ export class HapticRange {
     if (direction > 0) {
       const index = Math.floor((value - min + 0.0001) / step) + 1;
       const next = min + index * step;
-      return next <= max ? next : null;
+      return next < max ? next : null;
     }
 
     if (direction < 0) {
       const index = Math.ceil((value - min - 0.0001) / step) - 1;
       const next = min + index * step;
-      return next >= min ? next : null;
+      return next > min ? next : null;
     }
 
     return null;
@@ -280,19 +279,23 @@ export class HapticRange {
     );
   }
 
+  effectiveStoredStartLocal() {
+    return this.parkingApplied ? this.storedStartLocal : this.startLocalFull;
+  }
+
   applyFirstTargetGeometry(tick, direction) {
     if (tick === null || direction === 0) return;
 
     const targetX = this.xFromValue(tick);
-    const storedStart = this.capturedStartLocal ?? this.startLocalFull;
-    const height = this.options.driverHeight;
-
-    let width;
-    let changePosition;
+    const storedStart = this.effectiveStoredStartLocal();
+    const width = this.options.parkWidth;
 
     if (direction > 0) {
-      width = Math.max(120, storedStart + 60);
-      changePosition =
+      const requiredHeight = Math.max(
+        20,
+        width - storedStart + 12,
+      );
+      const changePosition =
         storedStart + this.options.startOffsetProportion * width;
 
       Object.assign(this.driver.style, {
@@ -300,11 +303,14 @@ export class HapticRange {
         left: `${targetX - changePosition}px`,
         right: 'auto',
         width: `${width}px`,
-        height: `${height}px`,
+        height: `${requiredHeight}px`,
       });
     } else {
-      width = Math.max(120, storedStart + height + 24);
-      changePosition =
+      const requiredHeight = Math.max(
+        20,
+        Math.min(120, (width - storedStart) / 2),
+      );
+      const changePosition =
         storedStart - this.options.startOffsetProportion * width;
 
       Object.assign(this.driver.style, {
@@ -312,14 +318,14 @@ export class HapticRange {
         left: `${targetX - changePosition}px`,
         right: 'auto',
         width: `${width}px`,
-        height: `${height}px`,
+        height: `${requiredHeight}px`,
       });
     }
 
     void this.driver.offsetWidth;
 
     this.debug(
-      `first target=${tick}; dir=${direction > 0 ? 'right' : 'left'}; width=${Math.round(width)}`,
+      `first target=${tick}; dir=${direction > 0 ? 'right' : 'left'}; stored=${Math.round(storedStart)}; width=${width}`,
     );
   }
 
@@ -392,10 +398,6 @@ export class HapticRange {
     }
 
     this.firstArmed = true;
-    this.capturedStartLocal = this.parkingApplied
-      ? this.storedStartLocal
-      : this.startLocalFull;
-
     this.targetTick = this.nextGridTick(
       this.currentValue,
       this.movementDirection,
@@ -410,18 +412,8 @@ export class HapticRange {
   setDirectionBeforeFirst(direction) {
     this.movementDirection = direction;
 
-    const elapsed = performance.now() - this.gestureStartedAt;
-
-    if (!this.firstArmed && elapsed < this.options.firstArmMs) {
+    if (!this.parkingApplied && !this.firstArmed) {
       this.applyParking(direction);
-    }
-
-    if (!this.firstArmed && elapsed >= this.options.firstArmMs) {
-      this.capturedStartLocal = this.parkingApplied
-        ? this.storedStartLocal
-        : this.startLocalFull;
-      this.armFirstNow();
-      return;
     }
 
     if (this.firstArmed && !this.hasTicked) {
@@ -486,7 +478,6 @@ export class HapticRange {
     this.movementDirection = 0;
     this.parkingApplied = false;
     this.storedStartLocal = null;
-    this.capturedStartLocal = null;
 
     this.firstArmed = false;
     this.hasTicked = false;
