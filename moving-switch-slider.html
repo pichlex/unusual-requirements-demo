@@ -1,0 +1,50 @@
+<!doctype html>
+<html lang="ru">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+  <meta name="theme-color" content="#f5f5f7">
+  <title>Moving Switch Haptic Slider</title>
+  <style>
+    :root{color-scheme:light dark;font-family:-apple-system,BlinkMacSystemFont,"SF Pro Text",system-ui,sans-serif;background:Canvas;color:CanvasText}*{box-sizing:border-box}body{margin:0;min-height:100svh;padding:max(24px,env(safe-area-inset-top)) 18px max(28px,env(safe-area-inset-bottom));background:color-mix(in srgb,Canvas 96%,CanvasText 4%)}main{width:min(100%,620px);margin:0 auto}h1{margin:0 0 8px;font-size:clamp(29px,8vw,44px);line-height:1.04;letter-spacing:-.038em}.lead{margin:0 0 20px;opacity:.72;line-height:1.48}.card{padding:20px;border:1px solid color-mix(in srgb,CanvasText 14%,transparent);border-radius:24px;background:Canvas;box-shadow:0 18px 50px color-mix(in srgb,CanvasText 9%,transparent)}.top{display:flex;align-items:baseline;justify-content:space-between;gap:16px;margin-bottom:14px}.top strong{font-size:18px}output{min-width:82px;text-align:right;font-size:38px;font-weight:760;font-variant-numeric:tabular-nums;letter-spacing:-.04em}.slider{position:relative;height:104px;margin:4px -4px 0;overflow:visible;touch-action:none;user-select:none;-webkit-user-select:none}.rail,.fill{position:absolute;left:14px;top:34px;height:8px;border-radius:999px;pointer-events:none}.rail{right:14px;background:color-mix(in srgb,CanvasText 16%,Canvas)}.fill{width:calc((100% - 28px) * .5);background:#0a84ff}.thumb{position:absolute;z-index:2;top:23px;left:50%;width:30px;height:30px;border-radius:50%;background:#fff;box-shadow:0 2px 9px rgb(0 0 0/.24),0 0 0 1px rgb(0 0 0/.06);transform:translateX(-50%);pointer-events:none}.thumb.hit{animation:hit .22s ease-out}@keyframes hit{50%{transform:translateX(-50%) scale(1.22)}}.ticks{position:absolute;left:14px;right:14px;top:47px;display:grid;grid-template-columns:repeat(6,1fr);pointer-events:none}.tick{justify-self:center;width:2px;height:15px;border-radius:2px;background:color-mix(in srgb,CanvasText 62%,transparent)}.labels{position:absolute;left:9px;right:9px;bottom:4px;display:flex;justify-content:space-between;font-size:12px;opacity:.58;pointer-events:none}#haptic-driver{position:absolute;z-index:10;top:0;left:0;width:100%;height:70px;margin:0;opacity:0;direction:ltr;writing-mode:horizontal-tb;cursor:pointer;touch-action:none;-webkit-tap-highlight-color:transparent}.metrics{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px;margin-top:14px}.metric{padding:11px 10px;border-radius:14px;background:color-mix(in srgb,CanvasText 6%,Canvas);text-align:center}.metric b,.metric span{display:block}.metric b{font-size:13px}.metric span{margin-top:3px;font-size:11px;line-height:1.35;opacity:.64}.note{margin-top:16px;padding:14px 15px;border-radius:15px;background:color-mix(in srgb,#ffcc00 15%,Canvas);font-size:14px;line-height:1.46}.log{margin-top:14px;min-height:112px;padding:13px 14px;border-radius:15px;background:color-mix(in srgb,CanvasText 7%,Canvas);font:12px/1.45 ui-monospace,SFMono-Regular,Menlo,monospace;white-space:pre-wrap;overflow-wrap:anywhere}footer{margin-top:14px;text-align:center;font-size:12px;opacity:.54}@media(max-width:430px){.metrics{grid-template-columns:1fr}.metric{text-align:left}}@media(prefers-reduced-motion:reduce){.thumb.hit{animation:none}}
+  </style>
+</head>
+<body>
+  <main>
+    <h1>Moving-switch slider</h1>
+    <p class="lead">Удерживай палец на шкале чуть дольше 0,2 секунды и веди его. Один и тот же настоящий HTML-switch динамически сдвигается под пальцем, чтобы его внутренний порог пересекался на крупных делениях.</p>
+    <section class="card">
+      <div class="top"><strong>Значение</strong><output id="value">50</output></div>
+      <div id="slider" class="slider">
+        <div class="rail"></div><div id="fill" class="fill"></div><div id="thumb" class="thumb"></div>
+        <div class="ticks" aria-hidden="true"><span class="tick"></span><span class="tick"></span><span class="tick"></span><span class="tick"></span><span class="tick"></span><span class="tick"></span></div>
+        <div class="labels" aria-hidden="true"><span>0</span><span>20</span><span>40</span><span>60</span><span>80</span><span>100</span></div>
+        <input id="haptic-driver" type="checkbox" switch aria-label="Ползунок с экспериментальной тактильной отдачей">
+      </div>
+      <div class="metrics" aria-hidden="true"><div class="metric"><b>Один switch</b><span>Жест не передаётся между элементами</span></div><div class="metric"><b>Порог 20</b><span>Геометрия меняется на 20/40/60/80</span></div><div class="metric"><b>Native light</b><span>Физическая сила задаётся Safari</span></div></div>
+      <div class="note">Это исследовательский PoC. В WebKit удержание switch активируется примерно через 200 мс. Начни вести после короткой паузы. Если механизм сработает, импульс должен появляться при каждом пересечении крупной отметки в обе стороны.</div>
+      <div id="log" class="log" role="status" aria-live="polite"></div>
+    </section>
+    <footer>iPhone Safari · один moving switch · без программных click()</footer>
+  </main>
+  <script>
+    const slider=document.querySelector('#slider'),driver=document.querySelector('#haptic-driver'),fill=document.querySelector('#fill'),thumb=document.querySelector('#thumb'),valueOutput=document.querySelector('#value'),logElement=document.querySelector('#log');
+    const DRIVER_WIDTH=190,DRIVER_HEIGHT=70,LEFT_FRACTION=.24,RIGHT_FRACTION=.76,ARM_DELAY_MS=235,MAJOR_STEP=20;
+    const lines=[];let activeTouchId=null,gestureStartedAt=0,phaseOn=false,previousRawValue=50,armed=false,lastRequestedTick=null;
+    function log(message){const time=new Date().toLocaleTimeString('ru-RU',{hour12:false});lines.unshift(`[${time}] ${message}`);logElement.textContent=lines.slice(0,8).join('\n')}
+    function clamp(value,minimum,maximum){return Math.max(minimum,Math.min(maximum,value))}
+    function touchById(touchList,identifier){for(const touch of touchList)if(touch.identifier===identifier)return touch;return null}
+    function rawValueFromClientX(clientX){const rect=slider.getBoundingClientRect(),usableWidth=Math.max(1,rect.width-28);return clamp((clientX-rect.left-14)/usableWidth,0,1)*100}
+    function render(rawValue,animate=false){const value=clamp(rawValue,0,100),rect=slider.getBoundingClientRect(),usableWidth=Math.max(1,rect.width-28),x=14+usableWidth*value/100;fill.style.width=`${usableWidth*value/100}px`;thumb.style.left=`${x}px`;valueOutput.value=String(Math.round(value));valueOutput.textContent=String(Math.round(value));if(animate){thumb.classList.remove('hit');void thumb.offsetWidth;thumb.classList.add('hit')}}
+    function placeDriver(clientX,visuallyOn){const rect=slider.getBoundingClientRect(),fingerFraction=visuallyOn?RIGHT_FRACTION:LEFT_FRACTION,left=clientX-rect.left-DRIVER_WIDTH*fingerFraction;driver.style.width=`${DRIVER_WIDTH}px`;driver.style.height=`${DRIVER_HEIGHT}px`;driver.style.left=`${left}px`;driver.style.top='0px'}
+    function restoreDriver(){driver.style.left='0px';driver.style.top='0px';driver.style.width='100%';driver.style.height='70px'}
+    function crossedMajorTick(fromValue,toValue){if(toValue>fromValue){const tick=(Math.floor(fromValue/MAJOR_STEP)+1)*MAJOR_STEP;return tick<=toValue&&tick<100?tick:null}if(toValue<fromValue){const tick=(Math.ceil(fromValue/MAJOR_STEP)-1)*MAJOR_STEP;return tick>=toValue&&tick>0?tick:null}return null}
+    driver.addEventListener('touchstart',event=>{if(event.targetTouches.length!==1)return;const touch=event.targetTouches[0];activeTouchId=touch.identifier;gestureStartedAt=performance.now();armed=false;phaseOn=false;lastRequestedTick=null;driver.checked=false;previousRawValue=rawValueFromClientX(touch.clientX);render(previousRawValue);placeDriver(touch.clientX,phaseOn);log(`touchstart ${Math.round(previousRawValue)} — держи ~0,2 с`)},{passive:true});
+    driver.addEventListener('touchmove',event=>{if(activeTouchId===null)return;const touch=touchById(event.targetTouches,activeTouchId);if(!touch)return;const rawValue=rawValueFromClientX(touch.clientX);render(rawValue);const elapsed=performance.now()-gestureStartedAt;if(!armed&&elapsed>=ARM_DELAY_MS){armed=true;previousRawValue=rawValue;placeDriver(touch.clientX,phaseOn);log(`tracking активен около ${Math.round(rawValue)}`);return}if(!armed){previousRawValue=rawValue;placeDriver(touch.clientX,phaseOn);return}const crossedTick=crossedMajorTick(previousRawValue,rawValue);if(crossedTick!==null&&crossedTick!==lastRequestedTick){phaseOn=!phaseOn;lastRequestedTick=crossedTick;placeDriver(touch.clientX,phaseOn);render(rawValue,true);log(`порог ${crossedTick}: midpoint flip → ${phaseOn?'ON':'OFF'}`)}else{placeDriver(touch.clientX,phaseOn);if(lastRequestedTick!==null&&Math.abs(rawValue-lastRequestedTick)>3)lastRequestedTick=null}previousRawValue=rawValue},{passive:true});
+    driver.addEventListener('touchend',event=>{const touchStillActive=touchById(event.targetTouches,activeTouchId);if(touchStillActive)return;log(`touchend; финальный checked=${driver.checked}`);activeTouchId=null;armed=false;setTimeout(()=>{driver.checked=false;restoreDriver()},60)},{passive:true});
+    driver.addEventListener('touchcancel',()=>{activeTouchId=null;armed=false;setTimeout(()=>{driver.checked=false;restoreDriver()},60);log('touchcancel')},{passive:true});
+    driver.addEventListener('change',event=>log(`change trusted=${event.isTrusted}; checked=${driver.checked}`));
+    window.addEventListener('resize',()=>render(previousRawValue));render(50);log('Готово. Зажми шкалу, подожди короткую паузу и проведи через 20/40/60/80.');
+  </script>
+</body>
+</html>
