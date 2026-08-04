@@ -15,14 +15,34 @@
 <body>
   <div id="app"></div>
   <script type="module">
-    const files = ['hero.html', 'sliders.html', 'components.html', 'package.html'];
-    const fragments = await Promise.all(files.map(async file => {
-      const response = await fetch(`./fragments/${file}`);
-      if (!response.ok) throw new Error(`Unable to load ${file}`);
-      return response.text();
-    }));
-    document.querySelector('#app').innerHTML = fragments.join('\n');
-    await import('./src/app.js');
+    document.documentElement.classList.add('js');
+
+    try {
+      const files = ['hero.html', 'sliders.html', 'components.html', 'package.html'];
+      const fragments = await Promise.all(files.map(async file => {
+        const response = await fetch(`./fragments/${file}`);
+        if (!response.ok) throw new Error(`Unable to load ${file}`);
+        return response.text();
+      }));
+
+      document.querySelector('#app').innerHTML = fragments.join('\n');
+      await import('./src/app.js');
+    } catch (error) {
+      document.documentElement.classList.remove('js');
+      document.querySelectorAll('.reveal').forEach(element => {
+        element.classList.add('is-visible');
+      });
+      console.error(error);
+
+      const app = document.querySelector('#app');
+      if (!app.innerHTML.trim()) {
+        app.innerHTML = `
+          <main style="max-width:760px;margin:120px auto;padding:24px;color:#fff;font-family:system-ui">
+            <h1>Haptic Lab</h1>
+            <p>Не удалось загрузить интерактивный модуль. Обновите страницу или откройте закреплённую commit-ссылку ещё раз.</p>
+          </main>`;
+      }
+    }
   </script>
 </body>
 </html>
