@@ -7,6 +7,10 @@ import {
 const $ = (selector, scope = document) => scope.querySelector(selector);
 const $$ = (selector, scope = document) => [...scope.querySelectorAll(selector)];
 
+function clamp(value, minimum, maximum) {
+  return Math.max(minimum, Math.min(maximum, value));
+}
+
 function formatValue(value, digits = 0) {
   return Number(value).toFixed(digits);
 }
@@ -203,6 +207,7 @@ function setupDial() {
     step: 5,
     value: 64,
     trackInset: 18,
+    driverHeight: 260,
     isMajor: (value) => value % 25 === 0,
     onValue: ({ value, ratio, animate }) => {
       const angle = -135 + ratio * 270;
