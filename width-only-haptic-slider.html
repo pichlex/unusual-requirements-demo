@@ -1,0 +1,588 @@
+<!doctype html>
+<html lang="ru">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+  <meta name="theme-color" content="#f5f5f7">
+  <title>Width-only Haptic Slider</title>
+  <style>
+    :root {
+      color-scheme: light dark;
+      font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", system-ui, sans-serif;
+      background: Canvas;
+      color: CanvasText;
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      min-height: 100svh;
+      padding: max(24px, env(safe-area-inset-top)) 18px max(28px, env(safe-area-inset-bottom));
+      background: color-mix(in srgb, Canvas 96%, CanvasText 4%);
+    }
+
+    main {
+      width: min(100%, 620px);
+      margin: 0 auto;
+    }
+
+    h1 {
+      margin: 0 0 8px;
+      font-size: clamp(29px, 8vw, 44px);
+      line-height: 1.04;
+      letter-spacing: -.038em;
+    }
+
+    .lead {
+      margin: 0 0 20px;
+      opacity: .72;
+      line-height: 1.48;
+    }
+
+    .card {
+      padding: 20px;
+      border: 1px solid color-mix(in srgb, CanvasText 14%, transparent);
+      border-radius: 24px;
+      background: Canvas;
+      box-shadow: 0 18px 50px color-mix(in srgb, CanvasText 9%, transparent);
+    }
+
+    .top {
+      display: flex;
+      align-items: baseline;
+      justify-content: space-between;
+      gap: 16px;
+      margin-bottom: 14px;
+    }
+
+    .top strong { font-size: 18px; }
+
+    output {
+      min-width: 82px;
+      text-align: right;
+      font-size: 38px;
+      font-weight: 760;
+      font-variant-numeric: tabular-nums;
+      letter-spacing: -.04em;
+    }
+
+    .slider {
+      position: relative;
+      height: 108px;
+      margin: 4px -4px 0;
+      overflow: visible;
+      touch-action: none;
+      user-select: none;
+      -webkit-user-select: none;
+    }
+
+    .rail,
+    .fill {
+      position: absolute;
+      left: 14px;
+      top: 35px;
+      height: 8px;
+      border-radius: 999px;
+      pointer-events: none;
+    }
+
+    .rail {
+      right: 14px;
+      background: color-mix(in srgb, CanvasText 16%, Canvas);
+    }
+
+    .fill {
+      width: 0;
+      background: #0a84ff;
+    }
+
+    .thumb {
+      position: absolute;
+      z-index: 2;
+      top: 24px;
+      left: 14px;
+      width: 30px;
+      height: 30px;
+      border-radius: 50%;
+      background: #fff;
+      box-shadow: 0 2px 9px rgb(0 0 0 / .24), 0 0 0 1px rgb(0 0 0 / .06);
+      transform: translateX(-50%);
+      pointer-events: none;
+      will-change: left;
+    }
+
+    .thumb.hit { animation: hit .22s ease-out; }
+
+    @keyframes hit {
+      50% { transform: translateX(-50%) scale(1.22); }
+    }
+
+    .ticks {
+      position: absolute;
+      left: 14px;
+      right: 14px;
+      top: 48px;
+      display: grid;
+      grid-template-columns: repeat(6, 1fr);
+      pointer-events: none;
+    }
+
+    .tick {
+      justify-self: center;
+      width: 2px;
+      height: 15px;
+      border-radius: 2px;
+      background: color-mix(in srgb, CanvasText 62%, transparent);
+    }
+
+    .labels {
+      position: absolute;
+      left: 9px;
+      right: 9px;
+      bottom: 4px;
+      display: flex;
+      justify-content: space-between;
+      font-size: 12px;
+      opacity: .58;
+      pointer-events: none;
+    }
+
+    #haptic-driver {
+      position: absolute;
+      z-index: 10;
+      top: 0;
+      left: 0;
+      right: auto;
+      width: 100%;
+      height: 72px;
+      margin: 0;
+      opacity: 0;
+      direction: ltr;
+      writing-mode: horizontal-tb;
+      cursor: pointer;
+      touch-action: none;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    .metrics {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 8px;
+      margin-top: 14px;
+    }
+
+    .metric {
+      padding: 11px 10px;
+      border-radius: 14px;
+      background: color-mix(in srgb, CanvasText 6%, Canvas);
+      text-align: center;
+    }
+
+    .metric b,
+    .metric span { display: block; }
+
+    .metric b { font-size: 13px; }
+
+    .metric span {
+      margin-top: 3px;
+      font-size: 11px;
+      line-height: 1.35;
+      opacity: .64;
+    }
+
+    .note {
+      margin-top: 16px;
+      padding: 14px 15px;
+      border-radius: 15px;
+      background: color-mix(in srgb, #ffcc00 15%, Canvas);
+      font-size: 14px;
+      line-height: 1.46;
+    }
+
+    .log {
+      margin-top: 14px;
+      min-height: 145px;
+      padding: 13px 14px;
+      border-radius: 15px;
+      background: color-mix(in srgb, CanvasText 7%, Canvas);
+      font: 12px/1.45 ui-monospace, SFMono-Regular, Menlo, monospace;
+      white-space: pre-wrap;
+      overflow-wrap: anywhere;
+    }
+
+    footer {
+      margin-top: 14px;
+      text-align: center;
+      font-size: 12px;
+      opacity: .54;
+    }
+
+    @media (max-width: 430px) {
+      .metrics { grid-template-columns: 1fr; }
+      .metric { text-align: left; }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      .thumb.hit { animation: none; }
+    }
+  </style>
+</head>
+<body>
+  <main>
+    <h1>Width-only haptic slider</h1>
+    <p class="lead">
+      Switch не двигается до завершения нативной 200‑мс активации.
+      Затем его середина выставляется на следующую крупную отметку только
+      изменением ширины.
+    </p>
+
+    <section class="card">
+      <div class="top">
+        <strong>Значение</strong>
+        <output id="value">50</output>
+      </div>
+
+      <div id="slider" class="slider">
+        <div class="rail"></div>
+        <div id="fill" class="fill"></div>
+        <div id="thumb" class="thumb"></div>
+
+        <div class="ticks" aria-hidden="true">
+          <span class="tick"></span><span class="tick"></span>
+          <span class="tick"></span><span class="tick"></span>
+          <span class="tick"></span><span class="tick"></span>
+        </div>
+
+        <div class="labels" aria-hidden="true">
+          <span>0</span><span>20</span><span>40</span>
+          <span>60</span><span>80</span><span>100</span>
+        </div>
+
+        <input
+          id="haptic-driver"
+          type="checkbox"
+          switch
+          aria-label="Экспериментальный ползунок с тактильной отдачей"
+        >
+      </div>
+
+      <div class="metrics" aria-hidden="true">
+        <div class="metric">
+          <b>Старт: 100%</b>
+          <span>Renderer не меняется первые 270 мс</span>
+        </div>
+        <div class="metric">
+          <b>Только width</b>
+          <span>Touch-target остаётся под пальцем</span>
+        </div>
+        <div class="metric">
+          <b>После события</b>
+          <span>Следующий midpoint ставится таймером</span>
+        </div>
+      </div>
+
+      <div class="note">
+        Зажми шкалу примерно на 0,3 секунды, затем веди. Лучше первый тест:
+        начни левее 20 и проведи вправо через 20 → 40 → 60 → 80.
+        После этого попробуй обратно.
+      </div>
+
+      <div id="log" class="log" role="status" aria-live="polite"></div>
+    </section>
+
+    <footer>iPhone Safari · width-only renderer experiment · без click()</footer>
+  </main>
+
+  <script>
+    const slider = document.querySelector('#slider');
+    const driver = document.querySelector('#haptic-driver');
+    const fill = document.querySelector('#fill');
+    const thumb = document.querySelector('#thumb');
+    const valueOutput = document.querySelector('#value');
+    const logElement = document.querySelector('#log');
+
+    const TRACK_INSET = 14;
+    const DRIVER_HEIGHT = 72;
+    const ARM_DELAY_MS = 270;
+    const MAJOR_STEP = 20;
+    const DIRECTION_EPSILON = 0.8;
+
+    const lines = [];
+
+    let activePointerId = null;
+    let activeTouchId = null;
+    let gestureStartedAt = 0;
+    let startValue = 50;
+    let currentValue = 50;
+    let previousTouchValue = 50;
+    let moveDirection = 0;
+    let armed = false;
+    let targetTick = null;
+    let geometryTimer = null;
+    let pointerMoves = 0;
+    let touchMoves = 0;
+    let lastDebugAt = 0;
+
+    function log(message) {
+      const time = new Date().toLocaleTimeString('ru-RU', { hour12: false });
+      lines.unshift(`[${time}] ${message}`);
+      logElement.textContent = lines.slice(0, 10).join('\n');
+    }
+
+    function clamp(value, minimum, maximum) {
+      return Math.max(minimum, Math.min(maximum, value));
+    }
+
+    function touchById(touchList, identifier) {
+      for (const touch of touchList) {
+        if (touch.identifier === identifier) return touch;
+      }
+      return null;
+    }
+
+    function trackMetrics() {
+      const rect = slider.getBoundingClientRect();
+      return {
+        rect,
+        left: TRACK_INSET,
+        right: rect.width - TRACK_INSET,
+        width: Math.max(1, rect.width - TRACK_INSET * 2)
+      };
+    }
+
+    function valueFromClientX(clientX) {
+      const { rect, left, width } = trackMetrics();
+      return clamp((clientX - rect.left - left) / width, 0, 1) * 100;
+    }
+
+    function render(value, animate = false) {
+      currentValue = clamp(value, 0, 100);
+
+      const { left, width } = trackMetrics();
+      const x = left + width * currentValue / 100;
+
+      fill.style.width = `${width * currentValue / 100}px`;
+      thumb.style.left = `${x}px`;
+      valueOutput.value = String(Math.round(currentValue));
+      valueOutput.textContent = String(Math.round(currentValue));
+
+      if (animate) {
+        thumb.classList.remove('hit');
+        void thumb.offsetWidth;
+        thumb.classList.add('hit');
+      }
+    }
+
+    function restoreFullDriver() {
+      clearTimeout(geometryTimer);
+      driver.style.left = '0px';
+      driver.style.right = 'auto';
+      driver.style.width = '100%';
+      driver.style.height = `${DRIVER_HEIGHT}px`;
+    }
+
+    function nearestTarget(value, direction) {
+      if (direction > 0) {
+        const next = (Math.floor(value / MAJOR_STEP) + 1) * MAJOR_STEP;
+        return next < 100 ? next : null;
+      }
+
+      if (direction < 0) {
+        const previous = (Math.ceil(value / MAJOR_STEP) - 1) * MAJOR_STEP;
+        return previous > 0 ? previous : null;
+      }
+
+      return null;
+    }
+
+    function applyThresholdGeometry(tick, direction) {
+      if (tick === null || direction === 0) {
+        restoreFullDriver();
+        return;
+      }
+
+      const { left, right, width } = trackMetrics();
+      const tickX = left + width * tick / 100;
+
+      if (direction > 0) {
+        const requiredWidth = Math.max(DRIVER_HEIGHT + 2, 2 * (tickX - left));
+        driver.style.left = `${left}px`;
+        driver.style.right = 'auto';
+        driver.style.width = `${requiredWidth}px`;
+      } else {
+        const requiredWidth = Math.max(DRIVER_HEIGHT + 2, 2 * (right - tickX));
+        driver.style.left = 'auto';
+        driver.style.right = `${slider.clientWidth - right}px`;
+        driver.style.width = `${requiredWidth}px`;
+      }
+
+      driver.style.height = `${DRIVER_HEIGHT}px`;
+
+      log(
+        `geometry target=${tick}, dir=${direction > 0 ? '→' : '←'}, ` +
+        `width=${Math.round(driver.getBoundingClientRect().width)}`
+      );
+    }
+
+    function scheduleThreshold(tick, direction) {
+      clearTimeout(geometryTimer);
+      geometryTimer = setTimeout(() => {
+        targetTick = tick;
+        applyThresholdGeometry(targetTick, direction);
+      }, 0);
+    }
+
+    function crossedTarget(fromValue, toValue, tick, direction) {
+      if (tick === null) return false;
+      if (direction > 0) return fromValue < tick && toValue >= tick;
+      if (direction < 0) return fromValue > tick && toValue <= tick;
+      return false;
+    }
+
+    window.addEventListener('pointerdown', event => {
+      if (event.pointerType !== 'touch' || event.target !== driver) return;
+      activePointerId = event.pointerId;
+      pointerMoves = 0;
+      render(valueFromClientX(event.clientX));
+    }, true);
+
+    window.addEventListener('pointermove', event => {
+      if (event.pointerId !== activePointerId) return;
+
+      pointerMoves += 1;
+      render(valueFromClientX(event.clientX));
+
+      const now = performance.now();
+      if (now - lastDebugAt > 550) {
+        lastDebugAt = now;
+        log(
+          `moves p=${pointerMoves}, t=${touchMoves}, ` +
+          `value=${Math.round(currentValue)}, target=${targetTick ?? '-'}`
+        );
+      }
+    }, true);
+
+    function finishPointer(event) {
+      if (event.pointerId !== activePointerId) return;
+      activePointerId = null;
+    }
+
+    window.addEventListener('pointerup', finishPointer, true);
+    window.addEventListener('pointercancel', finishPointer, true);
+
+    slider.addEventListener('touchstart', event => {
+      if (event.target !== driver || event.touches.length !== 1) return;
+
+      const touch = event.touches[0];
+
+      activeTouchId = touch.identifier;
+      gestureStartedAt = performance.now();
+      startValue = valueFromClientX(touch.clientX);
+      currentValue = startValue;
+      previousTouchValue = startValue;
+      moveDirection = 0;
+      armed = false;
+      targetTick = null;
+      touchMoves = 0;
+
+      restoreFullDriver();
+      render(startValue);
+
+      log(`start=${Math.round(startValue)}; geometry untouched for ${ARM_DELAY_MS}ms`);
+    }, { capture: true, passive: true });
+
+    slider.addEventListener('touchmove', event => {
+      if (activeTouchId === null) return;
+
+      const touch = touchById(event.touches, activeTouchId);
+      if (!touch) return;
+
+      touchMoves += 1;
+
+      const nextValue = valueFromClientX(touch.clientX);
+      const delta = nextValue - previousTouchValue;
+
+      render(nextValue);
+
+      if (Math.abs(delta) >= DIRECTION_EPSILON) {
+        const nextDirection = Math.sign(delta);
+
+        if (nextDirection !== moveDirection) {
+          moveDirection = nextDirection;
+
+          if (armed) {
+            const newTarget = nearestTarget(nextValue, moveDirection);
+            scheduleThreshold(newTarget, moveDirection);
+            log(`direction changed ${moveDirection > 0 ? '→' : '←'}; next=${newTarget ?? '-'}`);
+          }
+        }
+      }
+
+      const elapsed = performance.now() - gestureStartedAt;
+
+      if (!armed && elapsed >= ARM_DELAY_MS && moveDirection !== 0) {
+        armed = true;
+        targetTick = nearestTarget(nextValue, moveDirection);
+        applyThresholdGeometry(targetTick, moveDirection);
+
+        log(
+          `ARMED at ${Math.round(nextValue)}, ` +
+          `dir=${moveDirection > 0 ? '→' : '←'}, target=${targetTick ?? '-'}`
+        );
+      }
+
+      if (
+        armed &&
+        crossedTarget(previousTouchValue, nextValue, targetTick, moveDirection)
+      ) {
+        const crossed = targetTick;
+
+        render(nextValue, true);
+        log(`CROSS ${crossed} — ждём native haptic на этом touchmove`);
+
+        const following = nearestTarget(
+          crossed + moveDirection * 0.01,
+          moveDirection
+        );
+
+        scheduleThreshold(following, moveDirection);
+      }
+
+      previousTouchValue = nextValue;
+    }, { capture: true, passive: true });
+
+    function finishTouch(event) {
+      if (activeTouchId === null) return;
+      if (touchById(event.touches, activeTouchId)) return;
+
+      log(
+        `end value=${Math.round(currentValue)}, ` +
+        `p=${pointerMoves}, t=${touchMoves}, checked=${driver.checked}`
+      );
+
+      activeTouchId = null;
+      armed = false;
+      targetTick = null;
+
+      setTimeout(() => {
+        driver.checked = false;
+        restoreFullDriver();
+      }, 100);
+    }
+
+    slider.addEventListener('touchend', finishTouch, { capture: true, passive: true });
+    slider.addEventListener('touchcancel', finishTouch, { capture: true, passive: true });
+
+    driver.addEventListener('change', event => {
+      log(`native CHANGE trusted=${event.isTrusted}; checked=${driver.checked}`);
+    });
+
+    window.addEventListener('resize', () => render(currentValue));
+
+    restoreFullDriver();
+    render(50);
+    log('Готово: стартуй слева и веди вправо после короткой паузы.');
+  </script>
+</body>
+</html>
