@@ -1,0 +1,16 @@
+{
+  "name": "@pichlex/haptic-lab",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "Experimental iOS Safari haptic component engine and landing-page demo.",
+  "exports": {
+    ".": "./src/haptics.js",
+    "./haptics": "./src/haptics.js"
+  },
+  "files": [
+    "src/haptics.js",
+    "styles.css",
+    "README.md"
+  ]
+}
