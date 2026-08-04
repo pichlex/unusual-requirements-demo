@@ -1,0 +1,159 @@
+<!doctype html>
+<html lang="ru">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <meta name="theme-color" content="#f5f5f7" />
+  <title>iPhone Safari Haptic PoC</title>
+  <style>
+    :root {
+      color-scheme: light dark;
+      font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", system-ui, sans-serif;
+      background: Canvas;
+      color: CanvasText;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      min-height: 100svh;
+      display: grid;
+      place-items: center;
+      padding: max(24px, env(safe-area-inset-top)) 20px max(24px, env(safe-area-inset-bottom));
+      background: color-mix(in srgb, Canvas 96%, CanvasText 4%);
+    }
+    main { width: min(100%, 560px); }
+    h1 { margin: 0 0 8px; font-size: clamp(28px, 8vw, 42px); line-height: 1.05; letter-spacing: -0.035em; }
+    .lead { margin: 0 0 22px; opacity: .72; line-height: 1.45; }
+    .card {
+      background: Canvas;
+      border: 1px solid color-mix(in srgb, CanvasText 14%, transparent);
+      border-radius: 22px;
+      padding: 18px;
+      box-shadow: 0 18px 50px color-mix(in srgb, CanvasText 10%, transparent);
+    }
+    .switch-row {
+      min-height: 84px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 18px;
+      padding: 6px 2px;
+    }
+    .switch-row strong { display: block; font-size: 18px; }
+    .switch-row span { display: block; margin-top: 4px; font-size: 14px; opacity: .65; line-height: 1.35; }
+    input[type="checkbox"][switch] {
+      flex: 0 0 auto;
+      transform: scale(1.25);
+      transform-origin: right center;
+    }
+    .divider { height: 1px; background: color-mix(in srgb, CanvasText 12%, transparent); margin: 10px 0 16px; }
+    .actions { display: grid; gap: 10px; }
+    button {
+      appearance: none;
+      width: 100%;
+      min-height: 48px;
+      border: 1px solid color-mix(in srgb, CanvasText 14%, transparent);
+      border-radius: 14px;
+      background: color-mix(in srgb, Canvas 92%, CanvasText 8%);
+      color: CanvasText;
+      padding: 11px 14px;
+      font: inherit;
+      font-weight: 650;
+    }
+    button:active { transform: scale(.985); }
+    .note {
+      margin-top: 18px;
+      padding: 14px 15px;
+      border-radius: 15px;
+      background: color-mix(in srgb, #ffcc00 15%, Canvas);
+      line-height: 1.45;
+      font-size: 14px;
+    }
+    .log {
+      margin-top: 16px;
+      padding: 14px;
+      min-height: 110px;
+      border-radius: 15px;
+      background: color-mix(in srgb, CanvasText 7%, Canvas);
+      font: 12px/1.45 ui-monospace, SFMono-Regular, Menlo, monospace;
+      white-space: pre-wrap;
+      overflow-wrap: anywhere;
+    }
+    footer { margin-top: 14px; text-align: center; font-size: 12px; opacity: .55; }
+  </style>
+</head>
+<body>
+  <main>
+    <h1>Haptic PoC</h1>
+    <p class="lead">Откройте страницу именно в Safari на iPhone с iOS 18 или новее и коснитесь самого переключателя.</p>
+
+    <section class="card" aria-labelledby="native-title">
+      <label class="switch-row" for="native-switch">
+        <span>
+          <strong id="native-title">Нативный HTML switch</strong>
+          <span>При ручном касании Safari должен дать один системный тактильный отклик.</span>
+        </span>
+        <input id="native-switch" type="checkbox" switch aria-describedby="native-title" />
+      </label>
+
+      <div class="divider"></div>
+
+      <div class="actions">
+        <button id="programmatic" type="button">Переключить через JavaScript</button>
+        <button id="vibrate" type="button">Попробовать navigator.vibrate(20)</button>
+      </div>
+
+      <div class="note">
+        При загрузке страницы haptic не запускается. Ожидаемый рабочий случай — только реальное касание нативного переключателя пользователем.
+      </div>
+
+      <div id="log" class="log" role="status" aria-live="polite"></div>
+    </section>
+
+    <footer>Минимальный PoC без библиотек и сторонних скриптов</footer>
+  </main>
+
+  <script>
+    const nativeSwitch = document.querySelector('#native-switch');
+    const logEl = document.querySelector('#log');
+    const lines = [];
+
+    function log(message) {
+      const time = new Date().toLocaleTimeString('ru-RU', { hour12: false });
+      lines.unshift(`[${time}] ${message}`);
+      logEl.textContent = lines.slice(0, 9).join('\n');
+    }
+
+    log(`Страница загружена. UA: ${navigator.userAgent}`);
+    log(`Vibration API: ${typeof navigator.vibrate === 'function' ? 'есть' : 'нет'}`);
+
+    nativeSwitch.addEventListener('pointerdown', (event) => {
+      log(`pointerdown: ${event.pointerType || 'unknown'} — ожидаем системный haptic от Safari`);
+    });
+
+    nativeSwitch.addEventListener('change', () => {
+      log(`change: switch=${nativeSwitch.checked ? 'ON' : 'OFF'}`);
+    });
+
+    document.querySelector('#programmatic').addEventListener('click', () => {
+      nativeSwitch.checked = !nativeSwitch.checked;
+      nativeSwitch.dispatchEvent(new Event('change', { bubbles: true }));
+      log('Переключено программно: системный haptic не ожидается');
+    });
+
+    document.querySelector('#vibrate').addEventListener('click', () => {
+      if (typeof navigator.vibrate !== 'function') {
+        log('navigator.vibrate отсутствует в этом браузере');
+        return;
+      }
+
+      try {
+        const result = navigator.vibrate(20);
+        log(`navigator.vibrate(20) вернул: ${String(result)}`);
+      } catch (error) {
+        log(`navigator.vibrate вызвал ошибку: ${error?.message || error}`);
+      }
+    });
+  </script>
+</body>
+</html>
