@@ -29,6 +29,7 @@
 
       document.querySelector('#app').innerHTML = fragments.join('\n');
       await import('./src/app.js');
+      await import('./src/xy-pad-startup-fix.js');
       await import('./src/xy-pad-init.js');
     } catch (error) {
       document.documentElement.classList.remove('js');
