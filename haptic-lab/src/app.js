@@ -1,15 +1,13 @@
-import {
-  HapticRange,
-  bindHapticTap,
-  bindNativeToggle,
-} from './haptics.js';
+import { bindHapticTap, bindNativeToggle } from './haptics.js';
+import { AngularHapticDial, CrossPlatformRange } from './platform-haptics.js';
 
 const $ = (selector, scope = document) => scope.querySelector(selector);
 const $$ = (selector, scope = document) => [...scope.querySelectorAll(selector)];
 
-function clamp(value, minimum, maximum) {
-  return Math.max(minimum, Math.min(maximum, value));
-}
+const hasTouch = navigator.maxTouchPoints > 0;
+const hasFinePointer = window.matchMedia('(hover: hover) and (pointer: fine)').matches;
+document.documentElement.classList.add(hasTouch ? 'touch-capable' : 'desktop-pointer');
+if (hasFinePointer) document.documentElement.classList.add('fine-pointer');
 
 function formatValue(value, digits = 0) {
   return Number(value).toFixed(digits);
@@ -30,10 +28,7 @@ function buildTicks(container, { min, max, step, majorEvery, mediumEvery }) {
 
     if (majorEvery && Math.abs(value % majorEvery) < 0.0001) {
       tick.classList.add('is-major');
-    } else if (
-      mediumEvery &&
-      Math.abs(value % mediumEvery) < 0.0001
-    ) {
+    } else if (mediumEvery && Math.abs(value % mediumEvery) < 0.0001) {
       tick.classList.add('is-medium');
     }
 
@@ -63,12 +58,6 @@ function pulseTick(container, value, phase = 'primary') {
   closest.classList.add(phase === 'echo' ? 'is-echo' : 'is-hit');
 }
 
-function pulseCard(card, kind = 'minor') {
-  card.classList.remove('is-ticking', 'is-major-ticking');
-  void card.offsetWidth;
-  card.classList.add(kind === 'major' ? 'is-major-ticking' : 'is-ticking');
-}
-
 function createTicker(element, initial = 'Ready') {
   const entries = [initial];
 
@@ -95,7 +84,10 @@ function setupLinearDemo({
   const output = $(`#${id}-value`);
   const ticks = $(`#${id}-ticks`);
   const status = $(`#${id}-status`);
-  const ticker = createTicker(status, 'Touch and hold for a moment');
+  const ticker = createTicker(
+    status,
+    hasTouch ? 'Touch, hold briefly, then drag' : 'Drag with mouse or trackpad',
+  );
 
   buildTicks(ticks, {
     min: 0,
@@ -125,7 +117,7 @@ function setupLinearDemo({
     }
   };
 
-  const range = new HapticRange({
+  const range = new CrossPlatformRange({
     surface,
     driver,
     min: 0,
@@ -137,21 +129,21 @@ function setupLinearDemo({
     isMajor: (tickValue) =>
       Boolean(majorEvery) && Math.abs(tickValue % majorEvery) < 0.0001,
     onValue: render,
-    onTick: ({ value: tickValue, kind, phase, direction }) => {
+    onTick: ({ value: tickValue, kind, phase, direction, native }) => {
       pulseTick(ticks, tickValue, phase);
-      pulseCard(card, kind);
 
       const arrow = direction > 0 ? '→' : '←';
+      const source = native ? 'native' : 'visual';
       const label =
         phase === 'echo'
           ? `accent echo ${formatValue(tickValue, valueDigits)}`
-          : `${kind} ${formatValue(tickValue, valueDigits)} ${arrow}`;
+          : `${kind} ${formatValue(tickValue, valueDigits)} ${arrow} · ${source}`;
 
       ticker(label);
 
       card.dispatchEvent(
         new CustomEvent('haptic-tick', {
-          detail: { value: tickValue, kind, phase, direction },
+          detail: { value: tickValue, kind, phase, direction, native },
         }),
       );
     },
@@ -190,24 +182,26 @@ const intensityRange = setupLinearDemo({
 });
 
 function setupDial() {
-  const card = $('#dial-card');
   const surface = $('#dial-surface');
   const driver = $('#dial-driver');
   const output = $('#dial-value');
   const pointer = $('#dial-pointer');
   const halo = $('#dial-halo');
   const status = $('#dial-status');
-  const ticker = createTicker(status, 'Drag horizontally across the dial');
+  const ticker = createTicker(
+    status,
+    hasTouch ? 'Trace the arc with your finger' : 'Drag around the dial rim',
+  );
 
-  const dial = new HapticRange({
+  const dial = new AngularHapticDial({
     surface,
     driver,
     min: 0,
     max: 100,
     step: 5,
     value: 64,
-    trackInset: 18,
-    driverHeight: 260,
+    arcStart: -135,
+    arcEnd: 135,
     isMajor: (value) => value % 25 === 0,
     onValue: ({ value, ratio, animate }) => {
       const angle = -135 + ratio * 270;
@@ -222,9 +216,10 @@ function setupDial() {
         halo.classList.add('is-hit');
       }
     },
-    onTick: ({ value, kind, direction }) => {
-      pulseCard(card, kind);
-      ticker(`${kind} ${Math.round(value)} ${direction > 0 ? '↻' : '↺'}`);
+    onTick: ({ value, kind, direction, native }) => {
+      ticker(
+        `${kind} ${Math.round(value)} ${direction > 0 ? '↻' : '↺'} · ${native ? 'native' : 'visual'}`,
+      );
     },
   });
 
@@ -303,13 +298,15 @@ setupButton();
 
 function setupToggle() {
   const card = $('#toggle-card');
+  const control = $('#ambient-toggle-control');
   const input = $('#ambient-toggle');
   const label = $('#toggle-state');
   const status = $('#toggle-status');
-  const ticker = createTicker(status, 'Direct native switch');
+  const ticker = createTicker(status, 'Custom surface · native touch target');
 
   bindNativeToggle(input, ({ checked }) => {
     card.classList.toggle('is-enabled', checked);
+    control.classList.toggle('is-on', checked);
     document.body.classList.toggle('ambient-enabled', checked);
     label.textContent = checked ? 'Atmosphere on' : 'Atmosphere off';
     ticker(checked ? 'enabled' : 'disabled');
@@ -364,10 +361,12 @@ function setupNav() {
 setupNav();
 
 function setupPointerGlow() {
-  const cards = $$('.interactive-card');
+  if (!hasFinePointer) return;
 
+  const cards = $$('.interactive-card');
   for (const card of cards) {
     card.addEventListener('pointermove', (event) => {
+      if (event.pointerType === 'touch') return;
       const rect = card.getBoundingClientRect();
       card.style.setProperty('--pointer-x', `${event.clientX - rect.left}px`);
       card.style.setProperty('--pointer-y', `${event.clientY - rect.top}px`);
