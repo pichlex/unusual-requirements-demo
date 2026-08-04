@@ -19,7 +19,7 @@ function insertXYCard() {
   card.innerHTML = `
     <div class="component-header">
       <div>
-        <h3 class="component-title">Touch field</h3>
+        <h3 class="component-title">Поле</h3>
         <p class="component-copy">Свободное движение в двух измерениях. Сетка ощущается на каждом пересечении.</p>
       </div>
     </div>
@@ -51,7 +51,7 @@ function cleanMarkupBeforeBaseApp() {
   $('.trust-strip')?.remove();
   $('.hero-footnote')?.remove();
 
-  replaceText('.eyebrow', 'Haptic interface');
+  replaceText('.eyebrow', 'Тактильный интерфейс');
   const heroTitle = $('.hero-title');
   if (heroTitle) heroTitle.innerHTML = 'Интерфейс, который <span class="gradient-text">чувствуется.</span>';
   replaceText(
@@ -60,11 +60,11 @@ function cleanMarkupBeforeBaseApp() {
   );
   replaceText('.primary-cta', 'Попробовать');
   replaceText('.secondary-cta', 'Посмотреть API');
-  replaceText('.device-topbar span:first-child', 'Live preview');
-  replaceText('.device-live', 'Touch');
-  replaceText('.device-kicker', 'Interaction');
+  replaceText('.device-topbar span:first-child', 'Демонстрация');
+  replaceText('.device-live', 'Касание');
+  replaceText('.device-kicker', 'Движение');
   const deviceTitle = $('.device-title');
-  if (deviceTitle) deviceTitle.innerHTML = 'Move it.<br>Feel it.';
+  if (deviceTitle) deviceTitle.innerHTML = 'Двигай.<br>Чувствуй.';
   replaceText('.hero-haptic-title', 'Нажми');
   replaceText('.hero-haptic-copy', 'Один короткий системный отклик');
 
@@ -90,7 +90,7 @@ function cleanMarkupBeforeBaseApp() {
     {
       id: 'dense-card',
       title: 'Плотный',
-      description: 'Больше делений для тонкой настройки и быстрых scrub-жестов.',
+      description: 'Больше делений для тонкой настройки и быстрых жестов.',
       unit: '',
     },
     {
@@ -130,7 +130,7 @@ function cleanMarkupBeforeBaseApp() {
     '.package-copy',
     'Логика отделена от оформления: можно использовать готовые контролы или собрать собственный интерфейс поверх небольшого ES-модуля.',
   );
-  replaceText('.site-footer .footer-inner > span:last-child', 'Haptic Lab · browser interaction experiments');
+  replaceText('.site-footer .footer-inner > span:last-child', 'Haptic Lab · экспериментальные веб-контролы');
 }
 
 cleanMarkupBeforeBaseApp();
@@ -145,10 +145,10 @@ function cleanMarkupAfterBaseApp() {
   );
 
   const componentCopy = [
-    ['.tabs-card', 'Tabs', 'Быстрое переключение между разделами с коротким откликом.'],
-    ['.button-card', 'Button', 'Прямое действие с аккуратной пружиной и вспышкой вокруг точки нажатия.'],
-    ['#toggle-card', 'Toggle', 'Полностью кастомный переключатель с мягким магнитным движением.'],
-    ['#dial-card', 'Dial', 'Крутилка следует за реальным углом пальца вокруг центра.'],
+    ['.tabs-card', 'Вкладки', 'Быстрое переключение между разделами с коротким откликом.'],
+    ['.button-card', 'Кнопка', 'Прямое действие с аккуратной пружиной и вспышкой вокруг точки нажатия.'],
+    ['#toggle-card', 'Переключатель', 'Полностью кастомный переключатель с мягким магнитным движением.'],
+    ['#dial-card', 'Крутилка', 'Следует за реальным углом пальца вокруг центра.'],
   ];
 
   componentCopy.forEach(([selector, title, copy]) => {
