@@ -1,0 +1,344 @@
+.xy-card {
+  grid-column: 1 / -1;
+  min-height: auto;
+  padding: clamp(24px, 4vw, 38px);
+  opacity: 0;
+  transform: translateY(22px) scale(0.992);
+  transition:
+    opacity 620ms ease,
+    transform 820ms var(--ease-out),
+    border-color 280ms ease,
+    box-shadow 320ms ease;
+}
+
+.xy-card.is-mounted {
+  opacity: 1;
+  transform: none;
+}
+
+.xy-stage {
+  display: grid;
+  gap: 14px;
+  margin-top: 26px;
+}
+
+.xy-surface {
+  --xy-x: 52%;
+  --xy-y: 46%;
+  --xy-cell-x: 5;
+  --xy-cell-y: 3;
+  position: relative;
+  min-height: 390px;
+  aspect-ratio: 16 / 8.6;
+  overflow: clip;
+  contain: layout paint;
+  border: 1px solid rgba(255, 255, 255, 0.11);
+  border-radius: 30px;
+  outline: none;
+  background:
+    radial-gradient(circle at var(--xy-x) var(--xy-y), rgba(124, 101, 255, 0.22), transparent 22%),
+    radial-gradient(circle at 14% 8%, rgba(63, 190, 255, 0.08), transparent 34%),
+    radial-gradient(circle at 86% 92%, rgba(244, 114, 182, 0.055), transparent 30%),
+    linear-gradient(148deg, #15151d, #0b0b10 66%);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.065),
+    inset 0 -42px 90px rgba(0, 0, 0, 0.3),
+    0 28px 80px rgba(0, 0, 0, 0.25);
+  cursor: crosshair;
+  touch-action: none;
+  user-select: none;
+  -webkit-user-select: none;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.xy-surface::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  pointer-events: none;
+  background:
+    linear-gradient(110deg, transparent 22%, rgba(255, 255, 255, 0.035), transparent 70%);
+  transform: translateX(-70%);
+  opacity: 0.7;
+  transition: transform 1.2s var(--ease-out);
+}
+
+.xy-card:hover .xy-surface::before {
+  transform: translateX(72%);
+}
+
+.xy-surface:focus-visible {
+  border-color: rgba(145, 123, 255, 0.48);
+  box-shadow:
+    0 0 0 4px rgba(126, 103, 255, 0.12),
+    inset 0 1px 0 rgba(255, 255, 255, 0.065),
+    inset 0 -42px 90px rgba(0, 0, 0, 0.3),
+    0 28px 80px rgba(0, 0, 0, 0.25);
+}
+
+.xy-surface.is-fine-pointer.is-dragging {
+  cursor: grabbing;
+}
+
+.xy-grid {
+  position: absolute;
+  inset: 0;
+  opacity: 0.46;
+  pointer-events: none;
+  background-image:
+    linear-gradient(to right, rgba(255, 255, 255, 0.075) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(255, 255, 255, 0.075) 1px, transparent 1px),
+    linear-gradient(to right, rgba(255, 255, 255, 0.095) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(255, 255, 255, 0.095) 1px, transparent 1px);
+  background-size:
+    10% 100%,
+    100% 12.5%,
+    50% 100%,
+    100% 50%;
+  mask-image: linear-gradient(to bottom, transparent, black 7%, black 93%, transparent);
+  -webkit-mask-image: linear-gradient(to bottom, transparent, black 7%, black 93%, transparent);
+}
+
+.xy-active-cell {
+  position: absolute;
+  left: calc(var(--xy-cell-x) * 10%);
+  top: calc(var(--xy-cell-y) * 12.5%);
+  width: 10%;
+  height: 12.5%;
+  border: 1px solid rgba(154, 135, 255, 0.27);
+  background:
+    linear-gradient(145deg, rgba(144, 121, 255, 0.09), rgba(88, 170, 255, 0.025));
+  box-shadow: inset 0 0 28px rgba(126, 103, 255, 0.08);
+  pointer-events: none;
+  transition:
+    left 74ms linear,
+    top 74ms linear,
+    background 160ms ease,
+    box-shadow 160ms ease;
+}
+
+.xy-active-cell.is-hit {
+  animation: xy-cell-hit 240ms ease-out;
+}
+
+.xy-axis {
+  position: absolute;
+  z-index: 2;
+  pointer-events: none;
+  opacity: 0.7;
+}
+
+.xy-axis-x {
+  left: 0;
+  right: 0;
+  top: var(--xy-y);
+  height: 1px;
+  background:
+    linear-gradient(90deg, transparent, rgba(205, 197, 255, 0.28) 18%, rgba(205, 197, 255, 0.46) 50%, rgba(205, 197, 255, 0.28) 82%, transparent);
+}
+
+.xy-axis-y {
+  top: 0;
+  bottom: 0;
+  left: var(--xy-x);
+  width: 1px;
+  background:
+    linear-gradient(180deg, transparent, rgba(205, 197, 255, 0.28) 18%, rgba(205, 197, 255, 0.46) 50%, rgba(205, 197, 255, 0.28) 82%, transparent);
+}
+
+.xy-orb {
+  position: absolute;
+  z-index: 4;
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  transform: translate3d(-50%, -50%, 0);
+  pointer-events: none;
+  will-change: left, top, transform;
+}
+
+.xy-orb::before,
+.xy-orb::after {
+  content: "";
+  position: absolute;
+  border-radius: inherit;
+}
+
+.xy-orb::before {
+  inset: -16px;
+  border: 1px solid rgba(184, 170, 255, 0.2);
+  background: rgba(126, 103, 255, 0.035);
+  box-shadow: 0 0 36px rgba(106, 90, 255, 0.16);
+  transform: scale(0.86);
+}
+
+.xy-orb::after {
+  inset: 0;
+  border: 1px solid rgba(255, 255, 255, 0.64);
+  background:
+    radial-gradient(circle at 34% 27%, white, #ddd6ff 47%, #7862e9 100%);
+  box-shadow:
+    0 12px 30px rgba(0, 0, 0, 0.4),
+    0 0 0 6px rgba(126, 103, 255, 0.08),
+    0 0 36px rgba(126, 103, 255, 0.18);
+}
+
+.xy-orb-core {
+  position: absolute;
+  z-index: 1;
+  inset: 15px;
+  border-radius: 50%;
+  background: #6f59e9;
+  box-shadow: 0 0 13px rgba(111, 89, 233, 0.9);
+}
+
+.xy-orb.is-hit::before,
+.xy-surface.is-grid-hit .xy-orb::before {
+  animation: xy-orb-ring 260ms ease-out;
+}
+
+.xy-readout {
+  position: absolute;
+  z-index: 5;
+  right: 17px;
+  bottom: 16px;
+  display: flex;
+  gap: 9px;
+  pointer-events: none;
+}
+
+.xy-readout span {
+  min-width: 58px;
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 8px;
+  padding: 8px 10px;
+  border: 1px solid rgba(255, 255, 255, 0.085);
+  border-radius: 12px;
+  background: rgba(7, 7, 11, 0.52);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.04);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+}
+
+.xy-readout b {
+  color: rgba(255, 255, 255, 0.9);
+  font-size: 14px;
+  font-weight: 680;
+  font-variant-numeric: tabular-nums;
+}
+
+.xy-readout small {
+  color: rgba(255, 255, 255, 0.34);
+  font-size: 9px;
+  font-weight: 800;
+  letter-spacing: 0.1em;
+}
+
+.xy-driver {
+  position: absolute;
+  z-index: 12;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  margin: 0;
+  opacity: 0;
+  direction: ltr;
+  writing-mode: horizontal-tb;
+  cursor: crosshair;
+  touch-action: none;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.xy-surface.is-fine-pointer .xy-driver {
+  pointer-events: none;
+}
+
+.xy-caption {
+  display: flex;
+  justify-content: space-between;
+  gap: 18px;
+  padding: 0 4px;
+  color: rgba(244, 244, 250, 0.42);
+  font-size: 11px;
+  line-height: 1.4;
+}
+
+@keyframes xy-cell-hit {
+  44% {
+    border-color: rgba(193, 181, 255, 0.52);
+    background: rgba(126, 103, 255, 0.17);
+    box-shadow:
+      inset 0 0 34px rgba(126, 103, 255, 0.18),
+      0 0 30px rgba(126, 103, 255, 0.09);
+  }
+}
+
+@keyframes xy-orb-ring {
+  45% {
+    opacity: 0.96;
+    transform: scale(1.24);
+  }
+}
+
+@media (hover: none), (pointer: coarse) {
+  .xy-surface {
+    background:
+      radial-gradient(circle at var(--xy-x) var(--xy-y), rgba(124, 101, 255, 0.18), transparent 24%),
+      linear-gradient(148deg, #15151d, #0b0b10 66%);
+    box-shadow:
+      inset 0 1px 0 rgba(255, 255, 255, 0.055),
+      inset 0 -36px 74px rgba(0, 0, 0, 0.28);
+  }
+
+  .xy-surface::before {
+    display: none;
+  }
+
+  .xy-active-cell {
+    transition: none;
+  }
+
+  .xy-readout span {
+    backdrop-filter: none;
+    -webkit-backdrop-filter: none;
+  }
+}
+
+@media (max-width: 720px) {
+  .xy-card {
+    padding: 22px;
+    border-radius: 26px;
+  }
+
+  .xy-stage {
+    margin-top: 18px;
+  }
+
+  .xy-surface {
+    min-height: 340px;
+    aspect-ratio: 1 / 1;
+    border-radius: 24px;
+  }
+
+  .xy-caption {
+    align-items: flex-start;
+    flex-direction: column;
+    gap: 3px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .xy-card,
+  .xy-active-cell {
+    transition: none;
+  }
+
+  .xy-active-cell.is-hit,
+  .xy-orb.is-hit::before,
+  .xy-surface.is-grid-hit .xy-orb::before {
+    animation: none;
+  }
+}
