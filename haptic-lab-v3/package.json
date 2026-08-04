@@ -1,0 +1,7 @@
+{
+  "name": "@pichlex/haptic-lab",
+  "version": "0.3.0",
+  "private": true,
+  "type": "module",
+  "description": "Experimental tactile web controls for iPhone Safari with desktop fallbacks."
+}
