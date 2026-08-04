@@ -3,7 +3,7 @@
     <div class="section-heading reveal" data-reveal>
       <p class="section-kicker">02 / Component playground</p>
       <h2 class="section-title">Beyond the slider.</h2>
-      <p class="section-description">Тот же физический приём превращён в вкладки, action button, нативный toggle и круговую control surface.</p>
+      <p class="section-description">Тот же физический приём превращён во вкладки, action button, кастомный toggle и настоящую угловую control surface.</p>
     </div>
 
     <div class="component-grid">
@@ -89,8 +89,8 @@
       <article id="toggle-card" class="interactive-card component-card toggle-card reveal" data-reveal>
         <div class="component-header">
           <div>
-            <h3 class="component-title">Native toggle</h3>
-            <p class="component-copy">Нативный switch остаётся видимым, а окружение реагирует на состояние как целая сцена.</p>
+            <h3 class="component-title">Aurora toggle</h3>
+            <p class="component-copy">Полностью кастомная поверхность в духе современных UI-kit, но под ней остаётся реальный switch для iPhone haptic.</p>
           </div>
           <span class="component-number">05</span>
         </div>
@@ -99,9 +99,18 @@
           <div class="toggle-hero">
             <span class="toggle-orb" aria-hidden="true"></span>
             <div class="toggle-copy"><b id="toggle-state">Atmosphere off</b><span>Включает более живой ambient glow по всей странице.</span></div>
-            <input id="ambient-toggle" class="native-switch" type="checkbox" switch aria-label="Переключить атмосферное освещение">
+
+            <div id="ambient-toggle-control" class="aurora-toggle">
+              <span class="aurora-toggle-track" aria-hidden="true">
+                <span class="aurora-toggle-stars"></span>
+                <span class="aurora-toggle-thumb">
+                  <span class="aurora-toggle-core"></span>
+                </span>
+              </span>
+              <input id="ambient-toggle" class="aurora-toggle-driver" type="checkbox" switch aria-label="Переключить атмосферное освещение">
+            </div>
           </div>
-          <div class="toggle-state-row"><span>System-owned haptic</span><strong id="toggle-status">Direct native switch</strong></div>
+          <div class="toggle-state-row"><span>Custom visual · native touch layer</span><strong id="toggle-status">Ready</strong></div>
         </div>
       </article>
 
@@ -109,7 +118,7 @@
         <div class="component-header">
           <div>
             <h3 class="component-title">Rotary dial</h3>
-            <p class="component-copy">Круговая визуальная крутилка с горизонтальным drag-жестом и физическими шагами по 5.</p>
+            <p class="component-copy">Теперь крутилка вычисляет угол относительно центра и следует за пальцем или курсором по дуге, а не читает горизонтальный drag.</p>
           </div>
           <span class="component-number">06</span>
         </div>
@@ -126,9 +135,9 @@
           </div>
 
           <div class="dial-info">
-            <div class="dial-stat"><b>Horizontal gesture</b><span>Веди пальцем слева направо прямо поверх круга.</span></div>
-            <div class="dial-stat"><b>5-point detents</b><span>Мелкие физические шаги и акцент на четвертях.</span></div>
-            <div class="dial-stat"><b id="dial-status">Drag horizontally across the dial</b><span>Live event stream</span></div>
+            <div class="dial-stat"><b>True angular gesture</b><span>Веди по окружности: значение определяется углом относительно центра.</span></div>
+            <div class="dial-stat"><b>5-point detents</b><span>На Mac — визуальные detents; на iPhone — экспериментальные native ticks.</span></div>
+            <div class="dial-stat"><b id="dial-status">Trace the arc around the dial</b><span>Live event stream</span></div>
           </div>
         </div>
       </article>
