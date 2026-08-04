@@ -1,0 +1,100 @@
+<section id="sliders" class="section">
+  <div class="page-shell">
+    <div class="section-heading reveal" data-reveal>
+      <p class="section-kicker">01 / Haptic sliders</p>
+      <h2 class="section-title">Three densities.<br>One native engine.</h2>
+      <p class="section-description">Зажми ползунок на долю секунды и веди пальцем. Каждый порог формируется геометрией настоящего Safari switch, а не вызовом из JavaScript.</p>
+    </div>
+
+    <div class="demo-stack">
+      <article id="coarse-card" class="interactive-card range-card reveal" data-reveal>
+        <div class="card-topline">
+          <div>
+            <span class="card-eyebrow">Reference</span>
+            <h3 class="card-title">Precision slider</h3>
+            <p class="card-description">Чёткие десятки, крупные ориентиры через 20 и спокойный ритм для настроек продукта.</p>
+          </div>
+          <div class="value-cluster">
+            <output id="coarse-value" class="range-value">50</output>
+            <span class="value-unit">percent</span>
+          </div>
+        </div>
+
+        <div id="coarse-surface" class="haptic-range-surface">
+          <div class="range-track"></div>
+          <div id="coarse-fill" class="range-fill"></div>
+          <div id="coarse-thumb" class="range-thumb"></div>
+          <div id="coarse-ticks" class="range-ticks" aria-hidden="true"></div>
+          <div class="range-labels" aria-hidden="true"><span>0</span><span>20</span><span>40</span><span>60</span><span>80</span><span>100</span></div>
+          <input id="coarse-driver" class="haptic-driver" type="checkbox" switch aria-label="Precision haptic slider">
+        </div>
+
+        <div class="card-footer-row">
+          <div id="coarse-status" class="haptic-status">Touch and hold for a moment</div>
+          <div class="card-meta">10-point cadence</div>
+        </div>
+      </article>
+
+      <article id="dense-card" class="interactive-card range-card reveal" data-reveal>
+        <div class="card-topline">
+          <div>
+            <span class="card-eyebrow">Dense mode</span>
+            <h3 class="card-title">Micro-step slider</h3>
+            <p class="card-description">Плотная шкала с шагом 2 — для scrubber, timeline, fine tuning и музыкальных интерфейсов.</p>
+          </div>
+          <div class="value-cluster">
+            <output id="dense-value" class="range-value">42</output>
+            <span class="value-unit">micro value</span>
+          </div>
+        </div>
+
+        <div id="dense-surface" class="haptic-range-surface">
+          <div class="range-track"></div>
+          <div id="dense-fill" class="range-fill"></div>
+          <div id="dense-thumb" class="range-thumb"></div>
+          <div id="dense-ticks" class="range-ticks" aria-hidden="true"></div>
+          <div class="range-labels" aria-hidden="true"><span>0</span><span>20</span><span>40</span><span>60</span><span>80</span><span>100</span></div>
+          <input id="dense-driver" class="haptic-driver" type="checkbox" switch aria-label="Dense haptic slider">
+        </div>
+
+        <div class="card-footer-row">
+          <div id="dense-status" class="haptic-status">Touch and hold for a moment</div>
+          <div class="card-meta">51 physical thresholds</div>
+        </div>
+      </article>
+
+      <article id="intensity-card" class="interactive-card range-card reveal" data-reveal>
+        <div class="card-topline">
+          <div>
+            <span class="card-eyebrow">Accent mode</span>
+            <h3 class="card-title">Multi-level ticks</h3>
+            <p class="card-description">Малые деления дают одиночный тик, крупные — акцентированную пару доверенных переходов.</p>
+          </div>
+          <div class="value-cluster">
+            <output id="intensity-value" class="range-value">35</output>
+            <span class="value-unit">intensity map</span>
+          </div>
+        </div>
+
+        <div class="intensity-legend" aria-label="Легенда интенсивности">
+          <span class="legend-pill"><span class="legend-mark"></span>minor · single tick</span>
+          <span class="legend-pill"><span class="legend-mark is-accent"></span>major · accent doublet</span>
+        </div>
+
+        <div id="intensity-surface" class="haptic-range-surface">
+          <div class="range-track"></div>
+          <div id="intensity-fill" class="range-fill"></div>
+          <div id="intensity-thumb" class="range-thumb"></div>
+          <div id="intensity-ticks" class="range-ticks" aria-hidden="true"></div>
+          <div class="range-labels" aria-hidden="true"><span>0</span><span>20</span><span>40</span><span>60</span><span>80</span><span>100</span></div>
+          <input id="intensity-driver" class="haptic-driver" type="checkbox" switch aria-label="Multi-level haptic slider">
+        </div>
+
+        <div class="card-footer-row">
+          <div id="intensity-status" class="haptic-status">Touch and hold for a moment</div>
+          <div class="card-meta">5 minor / 20 accent</div>
+        </div>
+      </article>
+    </div>
+  </div>
+</section>
