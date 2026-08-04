@@ -1,0 +1,43 @@
+<section id="package" class="section package-section">
+  <div class="page-shell">
+    <div class="package-card reveal" data-reveal>
+      <div class="package-grid">
+        <div>
+          <p class="section-kicker">03 / Package direction</p>
+          <h2 class="package-title">From PoC to a small component engine.</h2>
+          <p class="package-copy">Демо уже использует отдельный ES-module: один класс управляет trusted drag-haptics, а небольшой adapter добавляет прямой haptic к tabs, buttons и другим tap targets. Следующий шаг — React wrapper, TypeScript types и npm-публикация.</p>
+          <div class="hero-actions" style="margin-top:26px">
+            <a class="primary-cta" href="./src/haptics.js">Open core module</a>
+            <a class="secondary-cta" href="./README.md">Read package notes</a>
+          </div>
+        </div>
+
+        <div class="code-window" aria-label="Пример API">
+          <div class="code-toolbar"><div class="code-dots"><span class="code-dot"></span><span class="code-dot"></span><span class="code-dot"></span></div><span class="code-file">haptics.js</span></div>
+          <pre><code><span class="token-keyword">import</span> { HapticRange } <span class="token-keyword">from</span> <span class="token-string">'./haptics.js'</span>;
+
+<span class="token-keyword">const</span> slider = <span class="token-keyword">new</span> HapticRange({
+  surface,
+  driver,
+  step: <span class="token-number">10</span>,
+  isMajor: value =&gt; value % <span class="token-number">20</span> === <span class="token-number">0</span>,
+  accentOffset: <span class="token-number">1.35</span>,
+  onTick: ({ value, kind }) =&gt; {
+    animateTick(value, kind);
+  },
+});
+
+<span class="token-comment">// No synthetic click(). The input remains the real touch target.</span></code></pre>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+</main>
+
+<footer class="site-footer">
+  <div class="page-shell footer-inner">
+    <span class="footer-brand"><span class="brand-mark" style="width:28px;height:28px;border-radius:10px" aria-hidden="true"></span>Haptic Lab</span>
+    <span>Experimental Safari interaction research · built as a static ES-module demo</span>
+  </div>
+</footer>
