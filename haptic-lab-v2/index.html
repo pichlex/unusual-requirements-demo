@@ -1,0 +1,43 @@
+<!doctype html>
+<html lang="ru">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#050507">
+  <meta name="color-scheme" content="dark">
+  <meta name="description" content="Haptic Lab v0.2 — iPhone tactile components with desktop fallbacks and a true angular rotary dial.">
+  <title>Haptic Lab v0.2</title>
+  <link rel="stylesheet" href="../haptic-lab/styles/base.css">
+  <link rel="stylesheet" href="../haptic-lab/styles/sliders.css">
+  <link rel="stylesheet" href="../haptic-lab/styles/components.css">
+  <link rel="stylesheet" href="../haptic-lab/styles/motion.css">
+  <link rel="stylesheet" href="./overrides.css">
+</head>
+<body>
+  <div id="app"></div>
+  <script type="module">
+    document.documentElement.classList.add('js');
+
+    try {
+      const base = '../haptic-lab/fragments/';
+      const files = ['hero.html', 'sliders.html', 'components.html', 'package.html'];
+      const fragments = await Promise.all(files.map(async file => {
+        const response = await fetch(`${base}${file}`);
+        if (!response.ok) throw new Error(`Unable to load ${file}`);
+        return response.text();
+      }));
+
+      document.querySelector('#app').innerHTML = fragments.join('\n');
+      await import('./app.js');
+    } catch (error) {
+      document.documentElement.classList.remove('js');
+      console.error(error);
+      document.querySelector('#app').innerHTML = `
+        <main style="max-width:760px;margin:120px auto;padding:24px;color:#fff;font-family:system-ui">
+          <h1>Haptic Lab v0.2</h1>
+          <p>Не удалось загрузить интерактивное демо. Обновите страницу.</p>
+        </main>`;
+    }
+  </script>
+</body>
+</html>
