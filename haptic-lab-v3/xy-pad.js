@@ -237,7 +237,7 @@ export class HapticXYPad {
       right: 'auto',
       top: '0px',
       width: `${this.options.parkWidth}px`,
-      height: `${this.options.parkHeight}px`,
+      height: `${Math.max(this.options.parkHeight, this.surface.clientHeight)}px`,
     });
 
     void this.driver.offsetWidth;
@@ -250,7 +250,11 @@ export class HapticXYPad {
     const storedStart = this.storedStartLocal ?? width - 1;
     const changePosition = storedStart + 0.4 * width;
     const targetPosition = localX - 2;
-    const requiredHeight = Math.max(20, width - storedStart + 12);
+    const requiredHeight = Math.max(
+      this.surface.clientHeight,
+      20,
+      width - storedStart + 12,
+    );
 
     Object.assign(this.driver.style, {
       direction: 'ltr',
@@ -276,7 +280,7 @@ export class HapticXYPad {
       right: 'auto',
       top: '0px',
       width: `${width}px`,
-      height: `${this.options.driverHeight}px`,
+      height: `${Math.max(this.options.driverHeight, this.surface.clientHeight)}px`,
     });
 
     void this.driver.offsetWidth;
@@ -296,7 +300,7 @@ export class HapticXYPad {
       right: 'auto',
       top: '0px',
       width: `${width}px`,
-      height: `${this.options.parkHeight}px`,
+      height: `${Math.max(this.options.parkHeight, this.surface.clientHeight)}px`,
     });
 
     void this.driver.offsetWidth;
@@ -356,9 +360,10 @@ export class HapticXYPad {
         source: 'touch',
       });
 
+      const clientX = touch.clientX;
       clearTimeout(this.parkTimer);
       this.parkTimer = setTimeout(() => {
-        if (this.activeTouchId !== null) this.parkForState(touch.clientX);
+        if (this.activeTouchId !== null) this.parkForState(clientX);
       }, 0);
     }
 
