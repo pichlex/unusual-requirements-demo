@@ -4,7 +4,7 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
   <meta name="theme-color" content="#f5f5f7" />
-  <title>iPhone Safari Haptic Slider PoC</title>
+  <title>Safari Haptic Reality Check</title>
   <style>
     :root {
       color-scheme: light dark;
@@ -12,389 +12,138 @@
       background: Canvas;
       color: CanvasText;
     }
-
     * { box-sizing: border-box; }
-
     body {
       margin: 0;
       min-height: 100svh;
-      display: grid;
-      place-items: center;
       padding: max(24px, env(safe-area-inset-top)) 18px max(28px, env(safe-area-inset-bottom));
       background: color-mix(in srgb, Canvas 96%, CanvasText 4%);
-      overscroll-behavior: none;
     }
-
-    main { width: min(100%, 580px); }
-
-    h1 {
-      margin: 0 0 8px;
-      font-size: clamp(28px, 8vw, 42px);
-      line-height: 1.05;
-      letter-spacing: -0.035em;
-    }
-
-    .lead {
-      margin: 0 0 22px;
-      opacity: .72;
-      line-height: 1.45;
-    }
-
+    main { width: min(100%, 620px); margin: 0 auto; }
+    h1 { margin: 0 0 8px; font-size: clamp(28px, 8vw, 42px); line-height: 1.05; letter-spacing: -.035em; }
+    .lead { margin: 0 0 20px; opacity: .72; line-height: 1.45; }
     .card {
-      background: Canvas;
+      margin: 14px 0;
+      padding: 18px;
       border: 1px solid color-mix(in srgb, CanvasText 14%, transparent);
-      border-radius: 24px;
-      padding: 20px;
-      box-shadow: 0 18px 50px color-mix(in srgb, CanvasText 10%, transparent);
+      border-radius: 22px;
+      background: Canvas;
     }
-
-    .topline {
-      display: flex;
-      align-items: baseline;
-      justify-content: space-between;
-      gap: 16px;
-      margin-bottom: 18px;
+    h2 { margin: 0 0 8px; font-size: 18px; }
+    p { line-height: 1.45; }
+    .switch-row { display: flex; align-items: center; justify-content: space-between; gap: 16px; min-height: 58px; }
+    input[type="checkbox"][switch] { transform: scale(1.2); transform-origin: right center; }
+    .value-row { display: flex; align-items: baseline; justify-content: space-between; gap: 16px; margin-bottom: 10px; }
+    output { font-size: 32px; font-weight: 750; font-variant-numeric: tabular-nums; }
+    input[type="range"] { width: 100%; height: 48px; margin: 0; }
+    .ticks { display: grid; grid-template-columns: repeat(11, 1fr); margin: -5px 9px 0; font-size: 11px; opacity: .55; }
+    .ticks span { text-align: center; }
+    .ticks span:first-child { text-align: left; }
+    .ticks span:last-child { text-align: right; }
+    button {
+      width: 100%; min-height: 46px; margin-top: 10px; padding: 10px 14px;
+      border: 1px solid color-mix(in srgb, CanvasText 15%, transparent);
+      border-radius: 13px; background: color-mix(in srgb, Canvas 92%, CanvasText 8%);
+      color: CanvasText; font: inherit; font-weight: 650;
     }
-
-    .topline strong { font-size: 18px; }
-
-    output {
-      min-width: 74px;
-      text-align: right;
-      font-size: 34px;
-      font-weight: 750;
-      font-variant-numeric: tabular-nums;
-      letter-spacing: -.035em;
-    }
-
-    .slider-shell {
-      position: relative;
-      padding: 14px 0 0;
-      touch-action: pan-y;
-    }
-
-    input[type="range"] {
-      --progress: 50%;
-      appearance: none;
-      -webkit-appearance: none;
-      position: relative;
-      z-index: 3;
-      display: block;
-      width: 100%;
-      height: 46px;
-      margin: 0;
-      background: transparent;
-      touch-action: pan-y;
-    }
-
-    input[type="range"]::-webkit-slider-runnable-track {
-      height: 8px;
-      border-radius: 999px;
-      background:
-        linear-gradient(to right,
-          #0a84ff 0,
-          #0a84ff var(--progress),
-          color-mix(in srgb, CanvasText 16%, Canvas) var(--progress),
-          color-mix(in srgb, CanvasText 16%, Canvas) 100%);
-    }
-
-    input[type="range"]::-webkit-slider-thumb {
-      -webkit-appearance: none;
-      width: 30px;
-      height: 30px;
-      margin-top: -11px;
-      border: 0;
-      border-radius: 50%;
-      background: #fff;
-      box-shadow:
-        0 2px 9px rgb(0 0 0 / .22),
-        0 0 0 1px rgb(0 0 0 / .05);
-    }
-
-    input[type="range"]:focus-visible {
-      outline: 3px solid color-mix(in srgb, #0a84ff 70%, transparent);
-      outline-offset: 4px;
-      border-radius: 10px;
-    }
-
-    .ticks {
-      display: grid;
-      grid-template-columns: repeat(51, 1fr);
-      align-items: start;
-      height: 22px;
-      margin: -6px 14px 0;
-      pointer-events: none;
-    }
-
-    .tick {
-      justify-self: center;
-      width: 1px;
-      height: 6px;
-      background: color-mix(in srgb, CanvasText 30%, transparent);
-      border-radius: 2px;
-    }
-
-    .tick.major {
-      width: 2px;
-      height: 14px;
-      background: color-mix(in srgb, CanvasText 62%, transparent);
-    }
-
-    .labels {
-      display: flex;
-      justify-content: space-between;
-      margin: 2px 11px 0;
-      font-size: 12px;
-      font-variant-numeric: tabular-nums;
-      opacity: .56;
-    }
-
-    .legend {
-      display: grid;
-      grid-template-columns: repeat(3, 1fr);
-      gap: 8px;
-      margin-top: 20px;
-    }
-
-    .legend-item {
-      padding: 11px 10px;
-      border-radius: 14px;
-      background: color-mix(in srgb, CanvasText 6%, Canvas);
-      text-align: center;
-    }
-
-    .legend-item b {
-      display: block;
-      font-size: 13px;
-    }
-
-    .legend-item span {
-      display: block;
-      margin-top: 3px;
-      font-size: 11px;
-      opacity: .62;
-    }
-
-    .controls {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: 16px;
-      margin-top: 18px;
-      padding-top: 17px;
-      border-top: 1px solid color-mix(in srgb, CanvasText 12%, transparent);
-    }
-
-    .controls strong { display: block; font-size: 15px; }
-    .controls small { display: block; margin-top: 3px; opacity: .58; line-height: 1.3; }
-
-    input[type="checkbox"][switch] {
-      flex: 0 0 auto;
-      transform: scale(1.15);
-      transform-origin: right center;
-    }
-
-    .note {
-      margin-top: 18px;
-      padding: 14px 15px;
-      border-radius: 15px;
+    .result {
+      padding: 14px 15px; border-radius: 15px;
       background: color-mix(in srgb, #ffcc00 15%, Canvas);
       line-height: 1.45;
-      font-size: 14px;
     }
-
     .log {
-      margin-top: 14px;
-      padding: 13px 14px;
-      min-height: 80px;
-      border-radius: 15px;
+      min-height: 118px; padding: 13px 14px; border-radius: 15px;
       background: color-mix(in srgb, CanvasText 7%, Canvas);
       font: 12px/1.45 ui-monospace, SFMono-Regular, Menlo, monospace;
-      white-space: pre-wrap;
-      overflow-wrap: anywhere;
+      white-space: pre-wrap; overflow-wrap: anywhere;
     }
-
-    .haptic-switch,
-    .haptic-label {
-      position: fixed;
-      left: -9999px;
-      top: -9999px;
-      width: 1px;
-      height: 1px;
-      opacity: 0;
-      pointer-events: none;
-    }
-
-    footer {
-      margin-top: 14px;
-      text-align: center;
-      font-size: 12px;
-      opacity: .55;
-    }
-
-    @media (prefers-reduced-motion: reduce) {
-      * { scroll-behavior: auto !important; }
-    }
+    .muted { margin: 6px 0 0; font-size: 13px; opacity: .65; }
   </style>
 </head>
 <body>
   <main>
-    <h1>Haptic Slider</h1>
-    <p class="lead">Веди ползунок пальцем. Малые деления дают одиночный импульс, крупные — двойной, края шкалы — тройной.</p>
+    <h1>Haptic Reality Check</h1>
+    <p class="lead">Проверка без хака: прямое касание нативного switch против нативного HTML-ползунка и синтетического click().</p>
 
-    <section class="card" aria-labelledby="slider-title">
-      <div class="topline">
-        <strong id="slider-title">Шкала 0–100</strong>
-        <output id="value" for="slider">50</output>
-      </div>
-
-      <div class="slider-shell">
-        <input
-          id="slider"
-          type="range"
-          min="0"
-          max="100"
-          step="2"
-          value="50"
-          aria-describedby="slider-help"
-        />
-        <div id="ticks" class="ticks" aria-hidden="true"></div>
-        <div class="labels" aria-hidden="true">
-          <span>0</span><span>20</span><span>40</span><span>60</span><span>80</span><span>100</span>
+    <section class="card">
+      <div class="switch-row">
+        <div>
+          <h2>1. Прямое касание switch</h2>
+          <p class="muted">Коснись именно переключателя. Здесь ожидается системный haptic Safari.</p>
         </div>
+        <input id="direct-switch" type="checkbox" switch aria-label="Прямой тест haptic" />
       </div>
-
-      <div class="legend" aria-hidden="true">
-        <div class="legend-item"><b>2</b><span>1 импульс</span></div>
-        <div class="legend-item"><b>10</b><span>2 импульса</span></div>
-        <div class="legend-item"><b>0 / 100</b><span>3 импульса</span></div>
-      </div>
-
-      <label class="controls" for="enabled">
-        <span>
-          <strong>Тактильная отдача</strong>
-          <small id="slider-help">Экспериментальный Safari-only паттерн</small>
-        </span>
-        <input id="enabled" type="checkbox" switch checked />
-      </label>
-
-      <div class="note">
-        Реальную силу импульса веб-страница не задаёт. Разница имитируется количеством коротких системных откликов.
-      </div>
-
-      <div id="log" class="log" role="status" aria-live="polite"></div>
+      <button id="synthetic" type="button">Вызвать switch.click() программно</button>
     </section>
 
-    <footer>Safari на iPhone · iOS 18+</footer>
+    <section class="card">
+      <div class="value-row">
+        <div>
+          <h2>2. Полностью нативный range</h2>
+          <p class="muted">Без appearance:none и без кастомного thumb.</p>
+        </div>
+        <output id="value" for="slider">50</output>
+      </div>
+      <input id="slider" type="range" min="0" max="100" step="1" value="50" list="marks" />
+      <datalist id="marks">
+        <option value="0"></option><option value="10"></option><option value="20"></option>
+        <option value="30"></option><option value="40"></option><option value="50"></option>
+        <option value="60"></option><option value="70"></option><option value="80"></option>
+        <option value="90"></option><option value="100"></option>
+      </datalist>
+      <div class="ticks" aria-hidden="true">
+        <span>0</span><span>10</span><span>20</span><span>30</span><span>40</span><span>50</span>
+        <span>60</span><span>70</span><span>80</span><span>90</span><span>100</span>
+      </div>
+    </section>
+
+    <section class="card">
+      <div class="result">
+        Если switch вибрирует, а range — нет, то веб-страница не может добавить импульсы на делениях: JavaScript-события и синтетические клики не запускают системный Taptic Engine. Разную силу на сайте Safari также задать нельзя.
+      </div>
+    </section>
+
+    <section class="card">
+      <h2>Диагностика событий</h2>
+      <div id="log" class="log" role="status" aria-live="polite"></div>
+    </section>
   </main>
 
-  <!-- Safari haptic trigger: click the associated label, not the input itself. -->
-  <input id="haptic-switch" class="haptic-switch" type="checkbox" switch tabindex="-1" aria-hidden="true" />
-  <label id="haptic-label" class="haptic-label" for="haptic-switch" aria-hidden="true"></label>
-
   <script>
+    const directSwitch = document.querySelector('#direct-switch');
     const slider = document.querySelector('#slider');
-    const valueOutput = document.querySelector('#value');
-    const enabledSwitch = document.querySelector('#enabled');
-    const hapticLabel = document.querySelector('#haptic-label');
-    const ticks = document.querySelector('#ticks');
+    const value = document.querySelector('#value');
     const logEl = document.querySelector('#log');
-
     const lines = [];
-    let previousValue = Number(slider.value);
-    let lastMinorPulseAt = 0;
 
     function log(message) {
       const time = new Date().toLocaleTimeString('ru-RU', { hour12: false });
       lines.unshift(`[${time}] ${message}`);
-      logEl.textContent = lines.slice(0, 6).join('\n');
+      logEl.textContent = lines.slice(0, 10).join('\n');
     }
 
-    function updateVisuals(value) {
-      valueOutput.value = String(value);
-      valueOutput.textContent = String(value);
-      slider.style.setProperty('--progress', `${value}%`);
-    }
-
-    function clickHapticSwitch() {
-      // label.click() is intentional: clicking the input directly does not
-      // consistently trigger Safari's switch haptic.
-      hapticLabel.click();
-    }
-
-    function playPattern(kind) {
-      if (!enabledSwitch.checked) return;
-
-      const now = performance.now();
-
-      if (kind === 'minor') {
-        // Avoid an uncontrollable buzz when input events arrive faster than
-        // the Taptic Engine can present distinct taps.
-        if (now - lastMinorPulseAt < 26) return;
-        lastMinorPulseAt = now;
-        clickHapticSwitch();
-        return;
-      }
-
-      if (kind === 'major') {
-        clickHapticSwitch();
-        window.setTimeout(clickHapticSwitch, 34);
-        return;
-      }
-
-      // Endpoint: a slightly wider three-tap signature.
-      clickHapticSwitch();
-      window.setTimeout(clickHapticSwitch, 30);
-      window.setTimeout(clickHapticSwitch, 76);
-    }
-
-    function crossedMajorTick(from, to) {
-      const low = Math.min(from, to);
-      const high = Math.max(from, to);
-      for (let value = Math.ceil(low / 10) * 10; value <= high; value += 10) {
-        if (value > low && value <= high) return value;
-      }
-      return null;
-    }
-
-    for (let value = 0; value <= 100; value += 2) {
-      const tick = document.createElement('span');
-      tick.className = value % 10 === 0 ? 'tick major' : 'tick';
-      ticks.appendChild(tick);
-    }
-
-    updateVisuals(previousValue);
-    log('Готово. Проведи ползунок пальцем.');
-
-    slider.addEventListener('input', () => {
-      const currentValue = Number(slider.value);
-      if (currentValue === previousValue) return;
-
-      updateVisuals(currentValue);
-
-      if (currentValue === 0 || currentValue === 100) {
-        playPattern('edge');
-        log(`${currentValue}: край — тройной паттерн`);
-      } else {
-        const major = crossedMajorTick(previousValue, currentValue);
-        if (major !== null) {
-          playPattern('major');
-          log(`${major}: крупное деление — двойной паттерн`);
-        } else {
-          playPattern('minor');
-        }
-      }
-
-      previousValue = currentValue;
+    directSwitch.addEventListener('click', (event) => {
+      log(`switch click: isTrusted=${event.isTrusted}, checked=${directSwitch.checked}`);
     });
 
-    slider.addEventListener('change', () => {
-      log(`Остановлено на ${slider.value}`);
+    document.querySelector('#synthetic').addEventListener('click', () => {
+      directSwitch.click();
+      log('Вызван directSwitch.click(); синтетический haptic не ожидается');
     });
 
-    enabledSwitch.addEventListener('change', () => {
-      log(`Haptic ${enabledSwitch.checked ? 'включён' : 'выключен'}`);
+    slider.addEventListener('input', (event) => {
+      value.value = slider.value;
+      value.textContent = slider.value;
+      const n = Number(slider.value);
+      if (n % 10 === 0) log(`range input: ${n}, isTrusted=${event.isTrusted}, крупное деление`);
     });
+
+    slider.addEventListener('change', (event) => {
+      log(`range change: ${slider.value}, isTrusted=${event.isTrusted}`);
+    });
+
+    log(`Vibration API: ${typeof navigator.vibrate === 'function' ? 'есть' : 'нет'}`);
+    log('Готово: сначала коснись switch, затем проведи нативный range.');
   </script>
 </body>
 </html>
