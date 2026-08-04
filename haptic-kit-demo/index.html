@@ -1,0 +1,540 @@
+<!doctype html>
+<html lang="ru">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+  <meta name="theme-color" content="#08090c">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <title>HapticKit — tactile interfaces for the web</title>
+  <link rel="stylesheet" href="./styles.css">
+</head>
+<body>
+  <div class="ambient ambient--one" aria-hidden="true"></div>
+  <div class="ambient ambient--two" aria-hidden="true"></div>
+  <div class="ambient ambient--three" aria-hidden="true"></div>
+  <div class="noise" aria-hidden="true"></div>
+
+  <header class="site-nav">
+    <a class="brand" href="#top" aria-label="HapticKit home">
+      <span class="brand-mark" aria-hidden="true">
+        <svg viewBox="0 0 24 24"><path d="M8 5v14M12 3v18M16 7v10M4 9v6M20 10v4"/></svg>
+      </span>
+      <span>HapticKit</span>
+      <span class="brand-badge">alpha</span>
+    </a>
+
+    <nav class="nav-links" aria-label="Навигация">
+      <a href="#ranges">Range lab</a>
+      <a href="#components">Components</a>
+      <a href="#api">API</a>
+    </nav>
+
+    <div class="nav-status">
+      <span class="status-dot"></span>
+      WebKit live
+    </div>
+  </header>
+
+  <main id="top">
+    <section class="hero section-shell">
+      <div class="hero-copy reveal">
+        <div class="eyebrow">
+          <span class="eyebrow-icon" aria-hidden="true">
+            <svg viewBox="0 0 24 24"><path d="M12 2v4M12 18v4M4.93 4.93l2.83 2.83M16.24 16.24l2.83 2.83M2 12h4M18 12h4M4.93 19.07l2.83-2.83M16.24 7.76l2.83-2.83"/></svg>
+          </span>
+          Native-feeling interactions · browser only
+        </div>
+
+        <h1>
+          Интерфейсы, которые<br>
+          можно <span class="gradient-text">почувствовать.</span>
+        </h1>
+
+        <p class="hero-lead">
+          Экспериментальный UI-kit поверх нативного WebKit switch:
+          tactile range, tabs, buttons и toggles без приложения,
+          разрешений и сторонних зависимостей.
+        </p>
+
+        <div class="hero-actions">
+          <div class="haptic-action hero-cta" data-action="hero">
+            <span class="action-shine" aria-hidden="true"></span>
+            <span class="action-content">
+              Почувствовать демо
+              <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
+            </span>
+            <input class="native-hit" type="checkbox" switch aria-label="Запустить haptic demo">
+          </div>
+
+          <a class="secondary-cta" href="#ranges">
+            Открыть лабораторию
+            <span aria-hidden="true">↘</span>
+          </a>
+        </div>
+
+        <div class="hero-proof">
+          <span><b>0</b> dependencies</span>
+          <i></i>
+          <span><b>1</b> native primitive</span>
+          <i></i>
+          <span><b>∞</b> UI patterns</span>
+        </div>
+      </div>
+
+      <div class="hero-visual reveal reveal--delay" aria-hidden="true">
+        <div class="signal-card">
+          <div class="signal-card__top">
+            <span class="signal-label">
+              <i></i>
+              LIVE HAPTIC SIGNAL
+            </span>
+            <span class="signal-chip">iPhone</span>
+          </div>
+
+          <div class="signal-orbit">
+            <div class="orbit orbit--one"></div>
+            <div class="orbit orbit--two"></div>
+            <div class="orbit orbit--three"></div>
+            <div class="signal-core">
+              <svg viewBox="0 0 24 24"><path d="M5 12h2l2-6 4 12 2-6h4"/></svg>
+            </div>
+          </div>
+
+          <div class="signal-wave">
+            <span style="--h:22%"></span><span style="--h:44%"></span>
+            <span style="--h:72%"></span><span style="--h:96%"></span>
+            <span style="--h:62%"></span><span style="--h:34%"></span>
+            <span style="--h:78%"></span><span style="--h:48%"></span>
+            <span style="--h:88%"></span><span style="--h:30%"></span>
+            <span style="--h:58%"></span><span style="--h:24%"></span>
+          </div>
+
+          <div class="signal-footer">
+            <div>
+              <span>Feedback</span>
+              <strong>UIImpact · light</strong>
+            </div>
+            <div class="signal-bars">
+              <i></i><i></i><i></i>
+            </div>
+          </div>
+        </div>
+
+        <div class="floating-pill floating-pill--top">
+          <span class="mini-icon">
+            <svg viewBox="0 0 24 24"><path d="M7 12h10M12 7v10"/></svg>
+          </span>
+          Trusted touch
+        </div>
+
+        <div class="floating-pill floating-pill--bottom">
+          <span class="mini-pulse"></span>
+          No native app
+        </div>
+      </div>
+    </section>
+
+    <section class="marquee-wrap" aria-label="Возможности">
+      <div class="marquee">
+        <div class="marquee-track">
+          <span>HAPTIC RANGE</span><i></i><span>TACTILE TABS</span><i></i>
+          <span>NATIVE BUTTON</span><i></i><span>STATEFUL TOGGLE</span><i></i>
+          <span>HAPTIC RANGE</span><i></i><span>TACTILE TABS</span><i></i>
+          <span>NATIVE BUTTON</span><i></i><span>STATEFUL TOGGLE</span><i></i>
+        </div>
+      </div>
+    </section>
+
+    <section id="ranges" class="section-shell section-block">
+      <div class="section-heading reveal">
+        <div>
+          <span class="section-kicker">01 · Range laboratory</span>
+          <h2>Три характера одного жеста.</h2>
+        </div>
+        <p>
+          Один и тот же native switch превращается в разные tactile-модели:
+          точный, плотный и акцентный.
+        </p>
+      </div>
+
+      <div class="range-grid">
+        <article
+          id="precision-range"
+          class="demo-card range-card range-card--hero reveal"
+          data-haptic-range
+          data-step="10"
+          data-major-step="20"
+          data-driver-height="72"
+          data-pattern="single"
+          data-initial="50"
+        >
+          <div class="card-glow" aria-hidden="true"></div>
+          <div class="range-card__head">
+            <div class="icon-tile icon-tile--violet">
+              <svg viewBox="0 0 24 24"><path d="M4 12h16M7 8v8M12 6v12M17 9v6"/></svg>
+            </div>
+            <div>
+              <span class="card-label">Precision</span>
+              <h3>Selection · 10</h3>
+            </div>
+            <span class="live-badge"><i></i> live</span>
+          </div>
+
+          <p class="card-copy">
+            Чистый одиночный tick на каждом десятом делении.
+            Базовый production-профиль.
+          </p>
+
+          <div class="range-output-row">
+            <span>Current value</span>
+            <output data-range-value>50</output>
+          </div>
+
+          <div class="haptic-range" data-range-track>
+            <div class="range-rail">
+              <div class="range-fill" data-range-fill></div>
+              <div class="range-aura" data-range-aura></div>
+            </div>
+            <div class="range-thumb" data-range-thumb>
+              <span></span>
+            </div>
+            <div class="range-ticks" data-range-ticks aria-hidden="true"></div>
+            <input class="native-range-driver" data-range-driver type="checkbox" switch aria-label="Precision haptic range">
+          </div>
+
+          <div class="range-meta">
+            <span data-range-status><i></i> Hold to engage</span>
+            <span>Step 10 · single pulse</span>
+          </div>
+        </article>
+
+        <article
+          id="dense-range"
+          class="demo-card range-card reveal"
+          data-haptic-range
+          data-step="5"
+          data-major-step="25"
+          data-driver-height="30"
+          data-pattern="single"
+          data-initial="35"
+        >
+          <div class="range-card__head">
+            <div class="icon-tile icon-tile--cyan">
+              <svg viewBox="0 0 24 24"><path d="M4 12h16M6 9v6M9 7v10M12 9v6M15 7v10M18 9v6"/></svg>
+            </div>
+            <div>
+              <span class="card-label">Microstep</span>
+              <h3>Dense · 5</h3>
+            </div>
+            <span class="card-chip">20 ticks</span>
+          </div>
+
+          <p class="card-copy">
+            Более плотная сетка для scrubbers, timelines и точной настройки.
+          </p>
+
+          <div class="range-output-row">
+            <span>Density</span>
+            <output data-range-value>35</output>
+          </div>
+
+          <div class="haptic-range haptic-range--dense" data-range-track>
+            <div class="range-rail">
+              <div class="range-fill" data-range-fill></div>
+              <div class="range-aura" data-range-aura></div>
+            </div>
+            <div class="range-thumb" data-range-thumb><span></span></div>
+            <div class="range-ticks" data-range-ticks aria-hidden="true"></div>
+            <input class="native-range-driver" data-range-driver type="checkbox" switch aria-label="Dense haptic range">
+          </div>
+
+          <div class="range-meta">
+            <span data-range-status><i></i> Hold to engage</span>
+            <span>Step 5 · micro feedback</span>
+          </div>
+        </article>
+
+        <article
+          id="weighted-range"
+          class="demo-card range-card range-card--weighted reveal reveal--delay"
+          data-haptic-range
+          data-step="5"
+          data-major-step="20"
+          data-driver-height="30"
+          data-pattern="weighted"
+          data-accent-gap="1.6"
+          data-initial="65"
+        >
+          <div class="range-card__head">
+            <div class="icon-tile icon-tile--amber">
+              <svg viewBox="0 0 24 24"><path d="M5 12h14M8 8v8M12 5v14M16 9v6"/></svg>
+            </div>
+            <div>
+              <span class="card-label">Weighted</span>
+              <h3>Accent levels</h3>
+            </div>
+            <span class="card-chip card-chip--accent">experimental</span>
+          </div>
+
+          <p class="card-copy">
+            Малые деления дают один light tick, крупные — выразительный
+            double accent.
+          </p>
+
+          <div class="range-output-row">
+            <span>Weighted value</span>
+            <output data-range-value>65</output>
+          </div>
+
+          <div class="haptic-range haptic-range--weighted" data-range-track>
+            <div class="range-rail">
+              <div class="range-fill" data-range-fill></div>
+              <div class="range-aura" data-range-aura></div>
+            </div>
+            <div class="range-thumb" data-range-thumb><span></span></div>
+            <div class="range-ticks" data-range-ticks aria-hidden="true"></div>
+            <input class="native-range-driver" data-range-driver type="checkbox" switch aria-label="Weighted haptic range">
+          </div>
+
+          <div class="range-meta">
+            <span data-range-status><i></i> Hold to engage</span>
+            <span>Minor ×1 · major ×2</span>
+          </div>
+        </article>
+      </div>
+    </section>
+
+    <section id="components" class="section-shell section-block">
+      <div class="section-heading reveal">
+        <div>
+          <span class="section-kicker">02 · Component playground</span>
+          <h2>Не только sliders.</h2>
+        </div>
+        <p>
+          Прямой trusted touch остаётся внутри настоящего switch,
+          а визуальный слой может выглядеть как угодно.
+        </p>
+      </div>
+
+      <div class="component-grid">
+        <article class="demo-card tabs-card reveal">
+          <div class="component-head">
+            <div>
+              <span class="card-label">Navigation</span>
+              <h3>Tactile tabs</h3>
+            </div>
+            <span class="component-index">01</span>
+          </div>
+
+          <div class="tabs-demo" data-tabs style="--tab-index:0">
+            <div class="tab-list" role="tablist" aria-label="Haptic tabs">
+              <span class="tab-indicator" aria-hidden="true"></span>
+
+              <div class="tab-item is-active" data-tab="0" role="tab" aria-selected="true">
+                <svg viewBox="0 0 24 24"><path d="M4 5h16v14H4zM8 9h8M8 13h5"/></svg>
+                Design
+                <input class="native-hit" type="checkbox" switch aria-label="Design tab">
+              </div>
+
+              <div class="tab-item" data-tab="1" role="tab" aria-selected="false">
+                <svg viewBox="0 0 24 24"><path d="M5 15c3-7 5-7 7 0s4 7 7 0M5 9c3-5 5-5 7 0s4 5 7 0"/></svg>
+                Motion
+                <input class="native-hit" type="checkbox" switch aria-label="Motion tab">
+              </div>
+
+              <div class="tab-item" data-tab="2" role="tab" aria-selected="false">
+                <svg viewBox="0 0 24 24"><path d="m9 7-5 5 5 5M15 7l5 5-5 5M13 5l-2 14"/></svg>
+                Code
+                <input class="native-hit" type="checkbox" switch aria-label="Code tab">
+              </div>
+            </div>
+
+            <div class="tab-panels">
+              <div class="tab-panel is-active" data-panel="0">
+                <div class="panel-visual panel-visual--design">
+                  <div class="design-orb"></div>
+                  <div class="design-card design-card--a"></div>
+                  <div class="design-card design-card--b"></div>
+                </div>
+                <div>
+                  <span>Layered visuals</span>
+                  <strong>Glass, depth, native feel.</strong>
+                  <p>Визуальная свобода без потери прямого trusted touch.</p>
+                </div>
+              </div>
+
+              <div class="tab-panel" data-panel="1">
+                <div class="panel-visual panel-visual--motion">
+                  <i></i><i></i><i></i><i></i><i></i>
+                </div>
+                <div>
+                  <span>Motion system</span>
+                  <strong>Feedback that lands on time.</strong>
+                  <p>Анимация и tactile-событие собираются в один момент.</p>
+                </div>
+              </div>
+
+              <div class="tab-panel" data-panel="2">
+                <div class="panel-code">
+                  <span><b>new</b> HapticKit.Range(<em>'#volume'</em>, {</span>
+                  <span>&nbsp;&nbsp;step: <i>10</i>,</span>
+                  <span>&nbsp;&nbsp;pattern: <em>'selection'</em></span>
+                  <span>})</span>
+                </div>
+                <div>
+                  <span>Composable API</span>
+                  <strong>One primitive, tiny surface.</strong>
+                  <p>Следующий этап — вынести этот движок в отдельный пакет.</p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </article>
+
+        <article class="demo-card action-card reveal reveal--delay">
+          <div class="component-head">
+            <div>
+              <span class="card-label">Action</span>
+              <h3>Haptic button</h3>
+            </div>
+            <span class="component-index">02</span>
+          </div>
+
+          <div class="launch-stage" data-launch-stage>
+            <div class="launch-rings" aria-hidden="true">
+              <i></i><i></i><i></i>
+            </div>
+
+            <div class="haptic-action launch-button" data-action="launch">
+              <span class="launch-button__halo" aria-hidden="true"></span>
+              <span class="action-content">
+                <svg viewBox="0 0 24 24" aria-hidden="true"><path d="m12 3 3 6 6 3-6 3-3 6-3-6-6-3 6-3z"/></svg>
+                Ship interaction
+              </span>
+              <input class="native-hit" type="checkbox" switch aria-label="Ship interaction">
+            </div>
+
+            <div class="particle-layer" data-particles aria-hidden="true"></div>
+
+            <div class="launch-meta">
+              <span>Trusted launches</span>
+              <strong data-launch-count>0</strong>
+            </div>
+          </div>
+        </article>
+
+        <article class="demo-card toggle-card reveal">
+          <div class="component-head">
+            <div>
+              <span class="card-label">State</span>
+              <h3>Haptic toggle</h3>
+            </div>
+            <span class="component-index">03</span>
+          </div>
+
+          <div class="toggle-stage" data-toggle-stage>
+            <div class="toggle-illustration" aria-hidden="true">
+              <div class="toggle-sphere">
+                <span></span>
+              </div>
+              <div class="toggle-rays">
+                <i></i><i></i><i></i><i></i>
+              </div>
+            </div>
+
+            <div class="toggle-copy">
+              <span>Ambient feedback</span>
+              <strong data-toggle-label>Haptics enabled</strong>
+              <p>Stateful control с настоящим switch под кастомным UI.</p>
+            </div>
+
+            <div class="custom-toggle is-on" data-custom-toggle>
+              <span class="custom-toggle__track">
+                <span class="custom-toggle__thumb">
+                  <svg viewBox="0 0 24 24"><path d="M7 12h10M12 7v10"/></svg>
+                </span>
+              </span>
+              <input class="native-hit" type="checkbox" switch checked aria-label="Toggle haptic mode">
+            </div>
+          </div>
+        </article>
+
+        <article id="api" class="demo-card api-card reveal reveal--delay">
+          <div class="api-card__copy">
+            <span class="section-kicker">03 · Package direction</span>
+            <h3>From PoC to primitive.</h3>
+            <p>
+              Демо уже использует общий класс <code>HapticRange</code>:
+              настройки шага, major accents, lifecycle и визуальные события
+              отделены от разметки.
+            </p>
+
+            <div class="api-pills">
+              <span>zero deps</span>
+              <span>progressive enhancement</span>
+              <span>Android fallback</span>
+            </div>
+          </div>
+
+          <div class="code-window">
+            <div class="code-window__bar">
+              <span><i></i><i></i><i></i></span>
+              <b>haptic-kit.js</b>
+              <em>API draft</em>
+            </div>
+            <pre><code><span class="code-purple">const</span> range = <span class="code-purple">new</span> HapticKit.<span class="code-blue">Range</span>(
+  <span class="code-green">'#intensity'</span>,
+  {
+    step: <span class="code-orange">5</span>,
+    majorStep: <span class="code-orange">20</span>,
+    pattern: <span class="code-green">'weighted'</span>
+  }
+)</code></pre>
+          </div>
+        </article>
+      </div>
+    </section>
+
+    <section class="section-shell final-cta reveal">
+      <div class="final-cta__glow" aria-hidden="true"></div>
+      <span class="section-kicker">The browser just moved.</span>
+      <h2>Теперь это похоже на продукт,<br>а не на хак.</h2>
+      <p>
+        Следующий шаг — TypeScript package, React adapter и нормальная
+        accessibility-стратегия.
+      </p>
+
+      <div class="haptic-action final-button" data-action="final">
+        <span class="action-content">
+          Зафиксировать API
+          <svg viewBox="0 0 24 24"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
+        </span>
+        <input class="native-hit" type="checkbox" switch aria-label="Lock package API">
+      </div>
+    </section>
+  </main>
+
+  <footer class="site-footer section-shell">
+    <a class="brand brand--footer" href="#top">
+      <span class="brand-mark" aria-hidden="true">
+        <svg viewBox="0 0 24 24"><path d="M8 5v14M12 3v18M16 7v10M4 9v6M20 10v4"/></svg>
+      </span>
+      HapticKit
+    </a>
+    <p>Experimental WebKit interaction lab · built from one native switch.</p>
+    <span>2026 · PoC</span>
+  </footer>
+
+  <div class="toast" data-toast role="status" aria-live="polite">
+    <span class="toast-icon">
+      <svg viewBox="0 0 24 24"><path d="M5 12h2l2-6 4 12 2-6h4"/></svg>
+    </span>
+    <span>
+      <b data-toast-title>Trusted interaction</b>
+      <small data-toast-copy>WebKit received a native control event.</small>
+    </span>
+  </div>
+
+  <script src="./haptic-kit.js"></script>
+</body>
+</html>
